@@ -217,6 +217,12 @@ def setrun(claw_pkg='geoclaw'):
     clawdata.inraty = [4,4]
     clawdata.inratt = [4,4]
 
+    # Instead of setting inratt ratios, set:
+    # geodata.variable_dt_refinement_ratios = True
+    # in setgeo.
+    # to automatically choose refinement ratios in time based on estimate
+    # of maximum wave speed on all grids at each level.
+
 
     # Specify type of each aux variable in clawdata.auxtype.
     # This must be a list of length maux, each element of which is one of:
@@ -260,26 +266,35 @@ def setgeo(rundata):
     Rearth=.5*(R1+R2)
     geodata.igravity = 1
     geodata.gravity = 9.81
-    geodata.icoordsys = 1
+    geodata.icoordsys = 1 #set to 2 for use with lat-lon coordinates on the sphere
     geodata.icoriolis = 0
     geodata.Rearth = Rearth
 
     # == settsunami.data values ==
     geodata.sealevel = -1000.0
     geodata.drytolerance = 1.e-3
-    geodata.wavetolerance = 5.e-2
-    geodata.depthdeep = 1.e2
-    geodata.maxleveldeep = 1
-    geodata.ifriction = 1
+    geodata.wavetolerance = 5.e-2 #for use with tsunami modeling. ignored when using flowgrades
+    geodata.depthdeep = 1.e2 #for use with tsunami modeling. ignored when using flowgrades
+    geodata.maxleveldeep = 1 #for use with tsunami modeling. ignored when using flowgrades
+    geodata.ifriction = 1 #use friction?
     geodata.coeffmanning = 0.033
-    geodata.frictiondepth = 10000.0
+    geodata.frictiondepth = 10000.0 #friction only applied with depths less than this
 
     # == settopo.data values ==
-    # set a path variable for the base topo directory for portability
+
+    # for topography, append lines of the form:
+    #   [topotype, minlevel,maxlevel,t0,tend,fname]
+    # minlevel and maxlevel specify the minimum and maximum level of refinement in
+    #   the region specified by the topography file.
+    # if minlevel and maxlevel are set to 1 and the total number of levels
+    # refinement occurs `normally.' ie. based on flowgrades etc.
+    # where topotype specifies the file format. See clawpack doc.
+    # the time interval specifies when the refinement rule is specified
+
     geodata.topofiles = []
     import os
-    topo=os.environ['TOPO']
 
+    #paths to topofiles...used in append.
     topopath = './'
     topofile4=os.path.join(topopath,'FlumeWall_-10.0m_4.4m_y2_1cm.tt2')
     topofile5=os.path.join(topopath,'FlumeWall_-10.0m_4.4m_y0_1cm.tt2')
@@ -293,7 +308,6 @@ def setgeo(rundata):
     geodata.topofiles.append([2, 1, 1, 0.0, 1.e10, topofile7])
     geodata.topofiles.append([2, 1, 3, 0.0, 1.e10, topofile8])
 
-    # == setdtopo.data values ==
     # == setdtopo.data values ==
     geodata.dtopofiles = []
     # for moving topography, append lines of the form:
@@ -311,7 +325,7 @@ def setgeo(rundata):
         #n=1,mq perturbation of q(i,j,n)
         #n=mq+1: surface elevation eta is defined by the file and results in h=max(eta-b,0)
 
-    geodata.qinitfiles.append([2,6,3,3,'FlumeQinit.tt2'])
+    geodata.qinitfiles.append([2,4,3,3,'FlumeQinit.tt2'])
 
     # == setauxinit.data values ==
     geodata.auxinitfiles = []
@@ -330,12 +344,14 @@ def setgeo(rundata):
     # == setfixedgrids.data values ==
     geodata.fixedgrids = []
     # for fixed grids append lines of the form
+    # Note: this is only for viewing output in non-AMR formats. This doesn't not affect the actual computation.
     # [t1,t2,noutput,x1,x2,y1,y2,xpoints,ypoints,\
     #  ioutarrivaltimes,ioutsurfacemax]
     #geodata.fixedgrids.append([54.e3,55.e3,100,-101.,-96.,14.,19.,1000,1000,0,0])
 
     # == setflowgrades.data values ==
     geodata.flowgrades = []
+    # this can be used to specify refinement criteria, for non-tsunami problems.
     # for using flowgrades for refinement append lines of the form
     # [flowgradevalue, flowgradevariable, flowgradetype, flowgrademinlevel]
     # where:
