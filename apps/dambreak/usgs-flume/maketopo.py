@@ -50,21 +50,21 @@ def maketopo():
     #wall0
     outfile = 'FlumeWall_-10.0m_4.4m_y0_1cm.tt2'
     xlower = -10.0
-    xupper = 4.4
+    xupper = 71.5
     ylower = -0.5
     yupper = 0.0
-    nxpoints = int((xupper-xlower)/0.01) + 1
-    nypoints = int((yupper-ylower)/0.01) + 1
+    nxpoints = int((xupper-xlower)/0.02) + 1
+    nypoints = int((yupper-ylower)/0.02) + 1
     gt.topo2writer(outfile,wall,xlower,xupper,ylower,yupper,nxpoints,nypoints)
 
     #wall2
     outfile= 'FlumeWall_-10.0m_4.4m_y2_1cm.tt2'
     xlower = -10.0
-    xupper = 4.4
+    xupper = 71.5
     ylower = 2.0
     yupper = 2.5
-    nxpoints = int((xupper-xlower)/0.01) + 1
-    nypoints = int((yupper-ylower)/0.01) + 1
+    nxpoints = int((xupper-xlower)/0.02) + 1
+    nypoints = int((yupper-ylower)/0.02) + 1
     gt.topo2writer(outfile,wall,xlower,xupper,ylower,yupper,nxpoints,nypoints)
 
 

@@ -1,6 +1,7 @@
 
-% Called from plotframe2 if
-%   PlotType == 13 (colored surface plot of topography and/or fluid)
+% Called from plotframe2 if 
+%   PlotType == 11 (colored surface plot of topography and/or fluid)
+%   PlotType == 12 (contour plot of topography and/or fluid)
 % Set
 %   PlotTopo == 1 to plot topography, 0 to suppress
 %   PlotFlow == 1 to plot flow, 0 to suppress
@@ -12,16 +13,13 @@ if ~exist('PlotTopo')
 if ~exist('PlotFlow')
   PlotFlow = 1;
   disp('*** setting PlotFlow = 1.  Set to 0 to suppress plotting flow')
-end
+  end
 
-meqnS = size(data);
-meqn = meqnS(2);
-neta = meqn;
 h = reshape(data(:,1),mx,my);                % depth
 hu = reshape(data(:,2),mx,my);               % momentum
 hv = reshape(data(:,3),mx,my);
-eta = reshape(data(:,neta),mx,my);              % surface
-topo = reshape(data(:,neta)-data(:,1),mx,my);   % topography
+eta = reshape(data(:,4),mx,my);              % surface
+topo = reshape(data(:,4)-data(:,1),mx,my);   % topography
 
 if PlotType == 11
 
@@ -39,37 +37,40 @@ if PlotType == 11
     hv2 = hv;   hv2(:,my+1) = hv2(:,my);   hv2(mx+1,:) = hv2(mx,:);
     eta2 = eta;   eta2(:,my+1) = eta2(:,my);   eta2(mx+1,:) = eta2(mx,:);
     topo2 = topo;   topo2(:,my+1) = topo2(:,my);   topo2(mx+1,:) = topo2(mx,:);
-
-
-    if mq==1
-        eta2color = h2;
-    elseif mq==2
-        eta2color = hu2./h2;
-    elseif mq==3
-        eta2color = hv2./h2;
-    elseif mq==4
-        eta2color = eta2;
-    end
-
-
+        
     if PlotTopo
       % plot topography:
-      geo_plot_topo
+      geo_plot_topo   
       end
-
+    
     if PlotFlow
       % plot surface of flow:
       geo_plot_surface
       end
-
+          
     view(2)  % top view
     axis tight
-
-end
-
-
-
+    end
 
 %----------------------------------
 
+if PlotType == 12
 
+    % contour plots
+
+    if ~exist('topoContourValues')
+      topoContourValues = 30;
+      disp(sprintf('*** Using topoContourValues = %g',topocontourValues))
+      end
+  
+    if PlotTopo
+      % plot topography:
+      contour(xcenter,ycenter,topo,topoContourValues,'g')
+      end
+    
+    if PlotFlow
+      % plot surface of flow:
+      contour(xcenter,ycenter,eta,ContourValues,'r')
+      end
+
+    end

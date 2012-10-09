@@ -1,5 +1,5 @@
 
-% geo_plot_surface.m plots the surface of the flow  
+% geo_plot_surface.m plots the surface of the flow
 %    eta = h + topo = q(:,:,1) + aux(:,:,1)
 %    eta2 = augmented version of size (mx+1) by (my+1) for call to surf.
 
@@ -21,7 +21,7 @@ if ~exist('flow_colormap')
   end
 
 
-eta2colors = mapzcolors(eta2,flow_colormap);
+eta2colors = mapzcolors(eta2color,flow_colormap);
 
 % set color to NaN in cells covered by finer grids:
 set_covered_ind
@@ -45,7 +45,7 @@ if (PlotGridEdges(level)==1)
     l2=line(xedge,0*xedge+yedge(end),eta2(:,end)+1000,'Color','k','LineWidth',1);
     l3=line(0*yedge+xedge(1),yedge,eta2(1,:)+1000,'Color','k','LineWidth',1);
     l4=line(0*yedge+xedge(end),yedge,eta2(end,:)+1000,'Color','k','LineWidth',1);
-    
+
 end
 
 %ylabel('Latitude','Fontsize',12)

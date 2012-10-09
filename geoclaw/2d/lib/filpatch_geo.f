@@ -20,7 +20,6 @@ c
 c :::::::::::::::::::::::::::::::::::::::;:::::::::::::::::::::::;
 
       use geoclaw_module
-      use digclaw_module
 
       implicit double precision (a-h,o-z)
 
@@ -208,32 +207,13 @@ c       interpolate back up
             enddo
 
 *           !find interpolation slope for eta = q(:,1)+ aux(:,1)
-            etalevel = sealevel
-            do i=-1,1
-               if (valcrse(ivalc(ic+i,jc,1)).ge.toldry) then
-                  etalevel = dmax1(etalevel,
-     &            valcrse(ivalc(ic+i,jc,1))+  auxcrse(iauxc(ic+i,jc)))
-               endif
-            enddo
-            do j=-1,1
-               if (valcrse(ivalc(ic,jc+j,1)).ge.toldry) then
-                  etalevel = dmax1(etalevel,
-     &            valcrse(ivalc(ic,jc+j,1))+  auxcrse(iauxc(ic,jc+j)))
-               endif
-            enddo
-            do i=-1,1
-               if (valcrse(ivalc(ic+i,jc,1)).ge.toldry) then
-                  etalevel = dmax1(etalevel,
-     &            valcrse(ivalc(ic+i,jc,1))+  auxcrse(iauxc(ic+i,jc)))
-               endif
-            enddo
             do i=-1,1
                etacrse(icrse(ic+i,jc)) = valcrse(ivalc(ic+i,jc,1))
      &            +  auxcrse(iauxc(ic+i,jc))
                if (valcrse(ivalc(ic+i,jc,1)).lt.toldry) then
-                  etacrse(icrse(ic+i,jc)) = etalevel
-               endif
-            enddo
+                  etacrse(icrse(ic+i,jc)) = sealevel
+                  endif
+               enddo
             s1 = etacrse(icrse(ic,jc))- etacrse(icrse(ic-1,jc))
             s2 = etacrse(icrse(ic+1,jc))- etacrse(icrse(ic,jc))
             if (s1*s2.le.0) then
@@ -246,9 +226,9 @@ c       interpolate back up
                etacrse(icrse(ic,jc+j)) = valcrse(ivalc(ic,jc+j,1))
      &            +  auxcrse(iauxc(ic,jc+j))
                if (valcrse(ivalc(ic,jc+j,1)).lt.toldry) then
-                  etacrse(icrse(ic,jc+j)) = etalevel
-               endif
-            enddo
+                  etacrse(icrse(ic,jc+j)) = sealevel
+                  endif
+               enddo
             s1 = etacrse(icrse(ic,jc))- etacrse(icrse(ic,jc-1))
             s2 = etacrse(icrse(ic,jc+1))- etacrse(icrse(ic,jc))
             if (s1*s2.le.0) then
@@ -327,14 +307,7 @@ c        ! determine momentum
                else
                   velmax(icrse(ic,jc)) = 0.d0
                   velmin(icrse(ic,jc)) = 0.d0
-                  if (ivar.eq.4) then
-                     velmax(icrse(ic,jc)) = m0
-                     velmin(icrse(ic,jc)) = m0
-                  elseif (ivar.eq.5) then
-                     velmax(icrse(ic,jc)) = grav*rho_f
-                     velmin(icrse(ic,jc)) = grav*rho_f
                   endif
-               endif
 
 *              !look for bounds on velocity to avoid generating new extrema
 *              !necessary since interpolating momentum linearly
@@ -372,7 +345,7 @@ c        ! determine momentum
                flag = flaguse(iff,jf)
                if (flag .eq. 0.0) then
                   if (.not.(fineflag(ivalc(ic,jc,1)))) then
-*                    !this is a normal wet cell. interpolate normally
+*                    !this is a normal wet cell. intepolate normally
                      hvf = valcrse(ivalc(ic,jc,ivar))
      &                   + eta1*slopex(icrse(ic,jc))
      &                   + eta2*slopey(icrse(ic,jc))
@@ -410,10 +383,6 @@ c        ! determine momentum
                            dividemass = max(hcrse,hfineave)
                            hfine = valbig(iff+nrowst-1,jf+ncolst-1,1)
                            Vnew = valcrse(ivalc(ic,jc,ivar))/dividemass
-                           if (ivar.gt.3) then
-                              Vnew = dmax1(velmin(icrse(ic,jc)),Vnew)
-                              Vnew = dmin1(velmax(icrse(ic,jc)),Vnew)
-                           endif
                            valbig(iff+nrowst-1,jf+ncolst-1,ivar) =
      &                           Vnew*valbig(iff+nrowst-1,jf+ncolst-1,1)
                         else

@@ -8,7 +8,6 @@ c
      4                  sp_over_h)
 
       use geoclaw_module
-      use digclaw_module
 
       implicit double precision (a-h,o-z)
 
@@ -18,7 +17,7 @@ c
       dimension   aux(mitot,mjtot,naux), auxc(mic,mjc,naux)
 
       double precision coarseval(3)
-      logical fineflag(5)
+      logical fineflag(3)
 
 
 c
@@ -54,7 +53,6 @@ c     call is sufficient.
 
 c    :::  mcapa  is the capacity function index
 
-
       if (naux .eq. 0) then
 c     if (mcapa .eq. 0) then
         if (xperdom .or. yperdom .or. spheredom) then
@@ -89,24 +87,12 @@ c     #prepare slopes - use min-mod limiters
       do i=2, mic-1
          fineflag(1) = .false.
 *        !interpolate eta to find depth---------------------------------------
-         etalevel = sealevel
-         do ii=-1,1
-            if (valc(i+ii,j,1).gt.toldry) then
-               etalevel = dmax1(etalevel,valc(i+ii,j,1)+ auxc(i+ii,j,1))
-            endif
-         enddo
-         do jj=-1,1
-            coarseval(2+jj) = valc(i,j+jj,1)+ auxc(i,j+jj,1)
-            if (valc(i,j+jj,1).gt.toldry) then
-               etalevel = dmax1(etalevel,valc(i,j+jj,1)+ auxc(i,j+jj,1))
-            endif
-         enddo
          do ii=-1,1
             coarseval(2+ii) = valc(i+ii,j,1)+ auxc(i+ii,j,1)
             if (valc(i+ii,j,1).le.toldry) then
-               coarseval(2+ii)=etalevel
-            endif
-         enddo
+               coarseval(2+ii)=sealevel
+               endif
+            enddo
          s1p=coarseval(3)-coarseval(2)
          s1m=coarseval(2)-coarseval(1)
          slopex=dmin1(dabs(s1p),dabs(s1m))*dsign(1.d0,
@@ -115,9 +101,9 @@ c     #prepare slopes - use min-mod limiters
          do jj=-1,1
             coarseval(2+jj) = valc(i,j+jj,1)+ auxc(i,j+jj,1)
             if (valc(i,j+jj,1).le.toldry) then
-               coarseval(2+jj)=etalevel
-            endif
-         enddo
+               coarseval(2+jj)=sealevel
+               endif
+            enddo
          s1p=coarseval(3)-coarseval(2)
          s1m=coarseval(2)-coarseval(1)
          slopey=dmin1(dabs(s1p),dabs(s1m))*dsign(1.d0,
@@ -138,9 +124,8 @@ c     #prepare slopes - use min-mod limiters
                finemass = finemass + val(ifine,jfine,1)
                if (val(ifine,jfine,1).le.toldry) then
                   fineflag(1) = .true.
-                  do ivar = 2,nvar
-                     val(ifine,jfine,ivar)=0.d0
-                  enddo
+                  val(ifine,jfine,2)=0.d0
+                  val(ifine,jfine,3)=0.d0
                   endif
                enddo
             enddo
@@ -167,15 +152,7 @@ c     #prepare slopes - use min-mod limiters
                else
                   velmax = 0.d0
                   velmin = 0.d0
-                  if (ivar.eq.4) then
-                     velmax=m0
-                     velmin=m0
-                  elseif (ivar.eq.5) then
-                     velmax = rho_f*grav
-                     velmin = rho_f*grav
                   endif
-               endif
-
                do ii = -1,1,2
                   if (valc(i+ii,j,1).gt.toldry) then
                      vel = valc(i+ii,j,ivar)/valc(i+ii,j,1)
@@ -214,10 +191,7 @@ c     #prepare slopes - use min-mod limiters
                   area = dble(lratiox*lratioy)
                   dividemass = max(finemass,valc(i,j,1))
                   Vnew = area*valc(i,j,ivar)/dividemass
-                  if (ivar.gt.3) then
-                     Vnew = dmax1(velmin,Vnew)
-                     Vnew = dmin1(velmax,Vnew)
-                  endif
+
                   do ico = 1,lratiox
                      do jco = 1,lratioy
                         jfine = (j-2)*lratioy + nghost + jco
@@ -232,6 +206,7 @@ c     #prepare slopes - use min-mod limiters
 
          enddo !end of coarse loop
          enddo !end of coarse loop
+
 c
 c      if (mcapa .ne. 0) then
 c        call fixcapaq(val,aux,mitot,mjtot,valc,auxc,mic,mjc,

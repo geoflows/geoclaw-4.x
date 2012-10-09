@@ -12,7 +12,7 @@ CLAWMAKE = $(CLAW)/util/Makefile.common
 # Adjust these variables if desired:
 # ----------------------------------
 
-CLAW_PKG = digclaw                  # Clawpack package to use
+CLAW_PKG = geoclaw                  # Clawpack package to use
 CLAW_EXE = xgeoclaw                 # Executable to create
 CLAW_setrun_file = setrun.py        # File containing function to make data
 CLAW_OUTDIR = _output               # Directory for output

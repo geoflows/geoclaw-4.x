@@ -12,7 +12,7 @@ import numpy as np
 
 
 #------------------------------
-def setrun(claw_pkg='digclaw'):
+def setrun(claw_pkg='geoclaw'):
 #------------------------------
 
     """
@@ -26,7 +26,7 @@ def setrun(claw_pkg='digclaw'):
 
     """
 
-    #assert claw_pkg.lower() == 'digclaw',  "Expected claw_pkg = 'digclaw'"
+    #assert claw_pkg.lower() == 'geoclaw',  "Expected claw_pkg = 'geoclaw'"
     ndim = 2
     rundata = data.ClawRunData(claw_pkg, ndim)
 
@@ -36,11 +36,6 @@ def setrun(claw_pkg='digclaw'):
 
     rundata = setgeo(rundata)   # Defined below
 
-    #------------------------------------------------------------------
-    # DigClaw specific parameters:
-    #------------------------------------------------------------------
-
-    rundata = setdig(rundata)   # Defined below
 
     #------------------------------------------------------------------
     # Standard Clawpack parameters to be written to claw.data:
@@ -66,13 +61,13 @@ def setrun(claw_pkg='digclaw'):
     clawdata.xlower = -10.0
     clawdata.xupper =  140.0
 
-    clawdata.ylower =  -2.0
-    clawdata.yupper =   4.0
+    clawdata.ylower =  -10.0
+    clawdata.yupper =   12.0
 
 
     # Number of grid cells:
     clawdata.mx = 150
-    clawdata.my = 12
+    clawdata.my = 22
 
 
     # ---------------
@@ -80,10 +75,10 @@ def setrun(claw_pkg='digclaw'):
     # ---------------
 
     # Number of equations in the system:
-    clawdata.meqn = 5
+    clawdata.meqn = 3
 
     # Number of auxiliary variables in the aux array (initialized in setaux)
-    clawdata.maux = 4
+    clawdata.maux = 3
 
     # Index of aux array corresponding to capacity function, if there is one:
     clawdata.mcapa = 0
@@ -109,8 +104,8 @@ def setrun(claw_pkg='digclaw'):
 
     if clawdata.outstyle==1:
         # Output nout frames at equally spaced times up to tfinal:
-        clawdata.nout = 200
-        clawdata.tfinal = 40.00
+        clawdata.nout = 100
+        clawdata.tfinal = 20.00
 
     elif clawdata.outstyle == 2:
         # Specify a list of output times.
@@ -218,16 +213,16 @@ def setrun(claw_pkg='digclaw'):
     clawdata.mxnest = -mxnest   # negative ==> anisotropic refinement in x,y,t
 
     # List of refinement ratios at each level (length at least mxnest-1)
-    clawdata.inratx = [5,2]
-    clawdata.inraty = [5,2]
-    clawdata.inratt = [5,2]
+    clawdata.inratx = [4,4]
+    clawdata.inraty = [4,4]
+    clawdata.inratt = [4,4]
 
 
     # Specify type of each aux variable in clawdata.auxtype.
     # This must be a list of length maux, each element of which is one of:
     #   'center',  'capacity', 'xleft', or 'yleft'  (see documentation).
 
-    clawdata.auxtype = ['center','center','yleft','center']
+    clawdata.auxtype = ['center','center','yleft']
 
 
     clawdata.tol = -1.0     # negative ==> don't use Richardson estimator
@@ -276,7 +271,7 @@ def setgeo(rundata):
     geodata.depthdeep = 1.e2
     geodata.maxleveldeep = 1
     geodata.ifriction = 1
-    geodata.coeffmanning = 0.0
+    geodata.coeffmanning = 0.033
     geodata.frictiondepth = 10000.0
 
     # == settopo.data values ==
@@ -284,31 +279,19 @@ def setgeo(rundata):
     geodata.topofiles = []
     import os
     topo=os.environ['TOPO']
-    topopath = os.path.join(topo,'usgs_flume','Logan')
 
-    topofile1=os.path.join(topopath,'FlumeWall_4.4m_71.6_1cm_y0.tt2')
-    topofile2=os.path.join(topopath,'FlumeWall_4.4m_71.6_1cm_y2.tt2')
-    topofile3=os.path.join(topopath,'FlumeBed_4.4m_71.6m_1cm.tt2')
-    topofile9=os.path.join(topopath,'Bare_RO_01m_smoothed.tt2')
-
-    topopath = 'topo'
+    topopath = './'
     topofile4=os.path.join(topopath,'FlumeWall_-10.0m_4.4m_y2_1cm.tt2')
     topofile5=os.path.join(topopath,'FlumeWall_-10.0m_4.4m_y0_1cm.tt2')
     topofile6=os.path.join(topopath,'FlumeHopper_-10.0m_4.4m_1cm.tt2')
-
-
     topofile7=os.path.join(topopath,'FlumeHillside_1m.tt2')
     topofile8=os.path.join(topopath,'FlumeRunoutPad_10cm.tt2')
 
-    geodata.topofiles.append([2, 2, 3, 0.0, 1.e10, topofile1])
-    geodata.topofiles.append([2, 2, 3, 0.0, 1.e10, topofile2])
-    #geodata.topofiles.append([2, 2, 3, 0.0, 1.e10, topofile3])
     geodata.topofiles.append([2, 2, 3, 0.0, 1.e10, topofile4])
     geodata.topofiles.append([2, 2, 3, 0.0, 1.e10, topofile5])
     geodata.topofiles.append([2, 2, 3, 0.0, 1.e10, topofile6])
     geodata.topofiles.append([2, 1, 1, 0.0, 1.e10, topofile7])
     geodata.topofiles.append([2, 1, 3, 0.0, 1.e10, topofile8])
-    #geodata.topofiles.append([2, 2, 3, 0.0, 1.e10, topofile9])
 
     # == setdtopo.data values ==
     # == setdtopo.data values ==
@@ -328,7 +311,7 @@ def setgeo(rundata):
         #n=1,mq perturbation of q(i,j,n)
         #n=mq+1: surface elevation eta is defined by the file and results in h=max(eta-b,0)
 
-    geodata.qinitfiles.append([2,6,3,3,'topo/FlumeQinit.tt2'])
+    geodata.qinitfiles.append([2,6,3,3,'FlumeQinit.tt2'])
 
     # == setauxinit.data values ==
     geodata.auxinitfiles = []
@@ -362,44 +345,6 @@ def setgeo(rundata):
     #flowgrademinlevel: refine to at least this level if flowgradevalue is exceeded.
     geodata.flowgrades.append([1.e-3, 2, 1, 3])
     geodata.flowgrades.append([1.e-4, 1, 1, 3])
-
-    return rundata
-
-def setdig(rundata):
-    """
-    Set DigClaw specific runtime parameters.
-    For documentation see ....
-    """
-
-    try:
-        digdata = rundata.digdata
-    except:
-        print "*** Error, this rundata has no digdata attribute"
-        raise AttributeError("Missing digdata attribute")
-
-    #set non-default values if needed
-    digdata.c1 = 1.0
-    digdata.phi_bed = 30.0
-    digdata.phi_int = 30.0
-    digdata.mu = 0.03
-    digdata.kappita = 6.0e-4
-    digdata.alpha = 1.0
-    digdata.m0 = 0.42
-    digdata.m_crit = 0.52
-    digdata.alpha = 1.0
-    digdata.phys_tol = 1.e-3
-
-    digdata.init_ptype = 0
-    digdata.init_pmax_ratio = 1.0
-
-    #to reduce to shallow water equations, uncomment the following
-    #digdata.c1= 0.0
-    #digdata.phi_int = 0.0
-    #digdata.phi_bed = 0.0
-    #digdata.kappita = 0.0
-    #digdata.mu = 0.0
-
-
 
     return rundata
 

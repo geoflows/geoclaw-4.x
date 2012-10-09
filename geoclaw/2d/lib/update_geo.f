@@ -3,7 +3,7 @@ c
 c -----------------------------------------------------------
 c
       subroutine update (level, nvar)
-
+      
       use geoclaw_module
 c
 c     # modified for shallow water on topography to use surface level eta
@@ -13,10 +13,6 @@ c
       implicit double precision (a-h,o-z)
 
       include  "call.i"
-
-      double precision husum(5)
-      double precision huc(5)
-      double precision huf(5)
 
       integer listgrids(numgrids(level))
 
@@ -147,10 +143,8 @@ c     and is never increased given an increase in mass
 
       etasum = 0.d0
       hsum = 0.d0
-      do ivar=2,nvar
-         husum(ivar) = 0.d0
-      enddo
-
+      husum = 0.d0
+      hvsum = 0.d0
 
       drytol=drytolerance
       nwet=0
@@ -165,24 +159,21 @@ c     and is never increased given an increase in mass
 
             hf = alloc(iaddf(iff+ico-1,jff+jco-1,1))*capa
             bf = alloc(iaddftopo(iff+ico-1,jff+jco-1))*capa
-            do ivar=2,nvar
-               huf(ivar)= alloc(iaddf(iff+ico-1,jff+jco-1,ivar))*capa
-            enddo
+            huf= alloc(iaddf(iff+ico-1,jff+jco-1,2))*capa
+            hvf= alloc(iaddf(iff+ico-1,jff+jco-1,3))*capa
 
             if (hf .gt. drytol) then
                etaf = hf+bf
                nwet=nwet+1
             else
                etaf = 0.d0
-               do ivar=2,nvar
-                  huf(ivar)=0.d0
-               enddo
+               huf=0.d0
+               hvf=0.d0
                endif
 
                hsum   = hsum + hf
-               do ivar=2,nvar
-                  husum(ivar)  = husum(ivar) + huf(ivar)
-               enddo
+               husum  = husum + huf
+               hvsum  = hvsum + hvf
                etasum = etasum + etaf
             enddo
          enddo
@@ -192,22 +183,19 @@ c     and is never increased given an increase in mass
          hav= hsum/dble(nwet)
 *         hc=max(etaav-bc*capac,0.d0) !tsunamiclaw method
          hc=min(hav,(max(etaav-bc*capac,0.d0)))
-         do ivar=2,nvar
-            huc(ivar)=(min(hav,hc)/hsum)*husum(ivar)
-         enddo
+         huc=(min(hav,hc)/hsum)*husum
+         hvc=(min(hav,hc)/hsum)*hvsum
       else
          hc=0.d0
-         do ivar=2,nvar
-            huc(ivar)=0.d0
-         enddo
+         huc=0.d0
+         hvc=0.d0
          endif
 
 c     # set h on coarse grid based on surface, not conservative near shoreline
 
       alloc(iadd(i,j,1)) = hc/capac
-      do ivar=2,nvar
-         alloc(iadd(i,j,ivar)) = huc(ivar)/capac
-      enddo
+      alloc(iadd(i,j,2)) = huc/capac
+      alloc(iadd(i,j,3)) = hvc/capac
 c
       if (uprint) write(outunit,103)(alloc(iadd(i,j,ivar)),
      .     ivar=1,nvar)
