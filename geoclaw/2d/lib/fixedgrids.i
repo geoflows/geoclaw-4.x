@@ -2,7 +2,7 @@
 c     # arrays and common blocks for fixed output grids
 
       parameter (maxfgrids=3)
-      parameter (maxfgridsize=404012)
+      parameter (maxfgridsize=32178450)
 
       dimension fgridearly(maxfgridsize)
       dimension fgridlate(maxfgridsize)
@@ -39,6 +39,6 @@ c===================================================================
       common /fgrid3/ fgridoften
       common /fgridparams/
      &       ylowfg, xhifg, yhifg, tstartfg, tendfg, dtfg, dxfg, dyfg,
-     &       tlastoutfg, tcfmax, xlowfg, i0fg, mxfg, myfg, noutfg, 
-     &       ilastoutfg, ioutarrivaltimes, ioutsurfacemax, i0fg2, 
+     &       tlastoutfg, tcfmax, xlowfg, i0fg, mxfg, myfg, noutfg,
+     &       ilastoutfg, ioutarrivaltimes, ioutsurfacemax, i0fg2,
      &       mfgridvars, mfgridvars2, mfgrids
