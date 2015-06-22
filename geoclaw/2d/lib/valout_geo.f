@@ -17,7 +17,6 @@ c graphics output of soln values for contour or surface plots.
 c modified for GeoClaw to output the surface level along with q.
 c    surface = q(i,j,1) + aux(i,j,1)
 c :::::::::::::::::::::::::::::::::::::;:::::::::::::::::::::::::::::::;
-
 c
 c     ### MATLAB graphics output
 c

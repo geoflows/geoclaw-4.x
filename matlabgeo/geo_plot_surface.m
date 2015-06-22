@@ -35,7 +35,11 @@ eta2colors(:,:,1) = eta2colors(:,:,1) .* dry_ind;
 cw=surf(X,Y,eta2.*covered_ind.*dry_ind,eta2colors); % Matlab has a bug regarding plotting edges--1/17/08 dlg
 
 if (PlotGrid(level)==1)
-    set(cw,'FaceColor','flat','EdgeColor',[0 0 0]);
+    %set(cw,'FaceColor','flat','EdgeColor',[0 0 0]);
+    hold on;
+    plot(X,Y,'k');
+    hold on;
+    plot(X',Y','k');
 else
     set(cw,'FaceColor','flat','EdgeColor','none');
 end

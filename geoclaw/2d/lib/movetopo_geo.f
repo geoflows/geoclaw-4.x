@@ -13,7 +13,7 @@ c
 c
       use geoclaw_module
       use topo_module
-      
+
       implicit double precision (a-h,o-z)
       dimension aux(1-mbc:maxmx+mbc,1-mbc:maxmy+mbc, maux)
       dimension dtopo(mxdtopo,mydtopo,mtdtopo)
@@ -27,7 +27,7 @@ c      dimension auxorig(-1:max1d+mbc,-1:max1d+mbc, maxaux)
         t0=t  !# start of coming timestep
         tf=t+dt !# end of coming timestep
         t2=t0+0.5d0*dt
-        tt=t2 !# this is the time in the fault file that will be used for this timestep
+        tt=t0 !# this is the time in the fault file that will be used for this timestep
 
 c       write(26,*) 'MOVETOPO: tt, dt, t0dtopo: ',tt,dt,t0dtopo
 
@@ -37,9 +37,11 @@ c       write(26,*) 'MOVETOPO: tt, dt, t0dtopo: ',tt,dt,t0dtopo
         endif
         if (topoaltered) return
         if (tf.lt.t0dtopo) return
-        if (t0.gt.tfdtopo) go to 28
+c        if (t0.gt.tfdtopo) go to 28
 
 c     # change topography
+
+
 
         write(*,*) 'MOVETOPO: setting dtopo at time = ',t
 c       write(26,*) 'MOVETOPO: setting dtopo at time = ',t
@@ -54,7 +56,7 @@ c       write(26,*) 'MOVETOPO: setting dtopo at time = ',t
         if (tt.le.t0dtopo) then
               kkm = 1
               kkp = 1
-              tau= 1.d0
+              tau= 0.d0
               go to 14
         endif
 
@@ -224,9 +226,10 @@ c===========================B.C.'s reset========================================
 
 c============= statically change topowork array for next call to setaux====
  28     continue
-        if (tt-dt.gt.tfdtopo) then
+        if (t0-dt.gt.tfdtopo) then
 c       if (.false.) then
           topoaltered=.true.  !# so this procedure only done once
+          
           write(*,*) 'MOVETOPO: Altering topography arrays at t=',t
           write(*,*) 'MOVETOPO: Topography Motion Complete'
           do m=1,mtopofiles
@@ -250,7 +253,7 @@ c       if (.false.) then
                      yjm=ylowtopo(m) + (jb-1.d0)*dytopo(m)
                      yjp = ylowtopo(m) + jb*dytopo(m)
 
-                if (yjm.le.yhidtopo.and.yjp.ge.ylowdtopo) then
+                if (yjm.lt.yhidtopo.and.yjp.gt.ylowdtopo) then
                     yjmc=max(yjm,ylowdtopo)
                     yjpc=min(yjp,yhidtopo)
                     dyc = yjpc-yjmc
