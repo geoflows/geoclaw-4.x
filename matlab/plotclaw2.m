@@ -65,7 +65,7 @@ Frame = -1;  % initialize frame counter
 
 if ~exist('MaxFrames')
    disp('MaxFrames parameter not set... you may need to execute setplot2')
-   break
+   return
    end
 
 set_value('outputdir','OutputDir','./');
@@ -79,6 +79,11 @@ while Frame <= MaxFrames
 
   Frame_old = Frame;
   queryframe;  % this sets Frame
+
+  if strcmp(inp,'q')
+  % quit now
+    break
+  end
 
   if (Frame ~= Frame_old | isempty(amrdata))
     [amrdata,t] = readamrdata(clawdim,Frame,outputdir,outputflag);

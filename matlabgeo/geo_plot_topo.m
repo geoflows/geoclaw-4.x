@@ -10,7 +10,7 @@
 %topo2masked = topo2 .* covered_ind;
 
 
-if ~exist('topo_colormap')
+while ~exist('topo_colormap')
   disp('*** You must define topo_colormap, e.g. to one of the maps')
   disp('    defined in geo_setzcolormaps.m')
   break
@@ -21,19 +21,19 @@ topo2colors = mapzcolors(topo2,topo_colormap);
 % set color to NaN in cells covered by finer grids:
 set_covered_ind
 topo2colors(:,:,1) = topo2colors(:,:,1) .* covered_ind;
-%keyboard
+
 %cw=surf(X,Y,topo2,topo2colors);
-cw=surf(X,Y,topo2.*covered_ind,topo2colors);
+htopo=surf(X,Y,topo2.*covered_ind,topo2colors);
 
 if (PlotGrid(level)==1)
-    hold on;
-    plot(X,Y,'k');
-    hold on;
-    plot(X',Y','k');
-    %set(cw,'FaceColor','interp','EdgeColor',[0 0 0]);
+    set(htopo,'FaceColor','interp','EdgeColor',[.5 .5 .5]);
 else
-    set(cw,'FaceColor','interp','EdgeColor','none');
+    set(htopo,'FaceColor','interp','EdgeColor','none');
 end
+htopo.AlphaData = ones(size(topo2));
+htopo.AlphaDataMapping ='none';
+htopo.FaceAlpha = 'interp';
+htopo.EdgeAlpha = .2;
 %set(cw,'FaceLighting','flat','SpecularColorReflectance',0.0,'SpecularStrength',1)
 
 if (PlotGridEdges(level)==1)
@@ -46,3 +46,4 @@ end
 
 %ylabel('Latitude','Fontsize',12)
 %xlabel('Longitude','Fontsize',12)
+hold on

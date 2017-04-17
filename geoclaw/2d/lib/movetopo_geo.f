@@ -43,7 +43,7 @@ c     # change topography
 
 
 
-        write(*,*) 'MOVETOPO: setting dtopo at time = ',t
+c        write(*,*) 'MOVETOPO: setting dtopo at time = ',t
 c       write(26,*) 'MOVETOPO: setting dtopo at time = ',t
 
         if (tt.ge.tfdtopo) then
