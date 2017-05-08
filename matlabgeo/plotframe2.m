@@ -286,7 +286,7 @@ for ng = 1:ngrids,
 	linecolors{level},linestyle{level});
 
   end; % end of plotting for PlotType == 4
-  if (PlotType==11 | PlotType==12)
+  if (PlotType==11 | PlotType==12 | PlotType==13)
     % for plotting GeoClaw output: plots both topography and flow
     % suface plots if PlotType==11 or contour plots if PlotType==1
     view_arg = 2;

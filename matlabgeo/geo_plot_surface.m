@@ -14,7 +14,7 @@
 %eta2masked = eta2masked .* dry_ind;
 
 
-if ~exist('flow_colormap')
+while ~exist('flow_colormap')
   disp('*** You must define flow_colormap, e.g. to one of the maps')
   disp('     defined in geo_setzcolormaps.m')
   break
@@ -32,17 +32,18 @@ geo_set_dry_ind
 eta2colors(:,:,1) = eta2colors(:,:,1) .* dry_ind;
 
 %cw=surf(X,Y,eta2,eta2colors);
-cw=surf(X,Y,eta2.*covered_ind.*dry_ind,eta2colors); % Matlab has a bug regarding plotting edges--1/17/08 dlg
+hsurf=surf(X,Y,eta2.*covered_ind.*dry_ind,eta2colors); % Matlab has a bug regarding plotting edges--1/17/08 dlg
 
 if (PlotGrid(level)==1)
-    %set(cw,'FaceColor','flat','EdgeColor',[0 0 0]);
-    hold on;
-    plot(X,Y,'k');
-    hold on;
-    plot(X',Y','k');
+    set(hsurf,'FaceColor','interp','EdgeColor',[.5 .5 .5]);
 else
-    set(cw,'FaceColor','flat','EdgeColor','none');
+    set(hsurf,'FaceColor','interp','EdgeColor','none');
 end
+
+hsurf.AlphaData = alpha_ind;
+hsurf.AlphaDataMapping ='none';
+hsurf.FaceAlpha = 'interp';
+hsurf.EdgeAlpha = 0.0;
 
 if (PlotGridEdges(level)==1)
     l1=line(xedge,0*xedge+yedge(1),eta2(:,1)+1000,'Color','k','LineWidth',1);

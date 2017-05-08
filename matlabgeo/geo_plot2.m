@@ -23,7 +23,7 @@ hv = reshape(data(:,3),mx,my);
 eta = reshape(data(:,neta),mx,my);              % surface
 topo = reshape(data(:,neta)-data(:,1),mx,my);   % topography
 
-if PlotType == 11
+if PlotType == 13
 
     [X,Y]=ndgrid(xedge,yedge);   % (mx+1) by (my+1) arrays
 
