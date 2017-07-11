@@ -30,7 +30,7 @@ if (PlotGrid(level)==1)
 else
     set(htopo,'FaceColor','interp','EdgeColor','none');
 end
-htopo.AlphaData = ones(size(topo2));
+htopo.AlphaData = ones(size(topo2)).*covered_ind;
 htopo.AlphaDataMapping ='none';
 htopo.FaceAlpha = 'interp';
 htopo.EdgeAlpha = .2;

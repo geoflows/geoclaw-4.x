@@ -40,7 +40,7 @@ else
     set(hsurf,'FaceColor','interp','EdgeColor','none');
 end
 
-hsurf.AlphaData = alpha_ind;
+hsurf.AlphaData = alpha_ind.*covered_ind;
 hsurf.AlphaDataMapping ='none';
 hsurf.FaceAlpha = 'interp';
 hsurf.EdgeAlpha = 0.0;
