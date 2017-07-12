@@ -293,15 +293,6 @@ for ng = 1:ngrids,
     geo_plot2;
   end
   
-  if (PlotType>=13)
-    % for plotting DigClaw output: plots both topography and flow
-    % 13: suface plots colored by pressure
-    % 14: surface plots colored by depth
-    view_arg = 2;
-    dig_plot2;
-  end
-  
-
 if exist('aftergrid')==2
   % make an m-file with this name for any other commands you
   % want executed at the end of drawing each grid
