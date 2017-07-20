@@ -43,7 +43,7 @@ c     # set hu = hv = 0 in all these cells
         enddo
       enddo
 
-      write(26,*) 'B4STEP2: t, num_dtopo: ', t,num_dtopo
+c      write(26,*) 'B4STEP2: t, num_dtopo: ', t,num_dtopo
 !$OMP CRITICAL
 !$OMP FLUSH
       do i=1,num_dtopo
