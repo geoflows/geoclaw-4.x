@@ -35,7 +35,7 @@ c     # set hu = hv = 0 in all these cells
       do i=1-mbc,mx+mbc
         do j=1-mbc,my+mbc
           if (q(i,j,1).lt.drytolerance) then
-             q(i,j,1) = max(q(i,j,1),0.d0)
+             q(i,j,1) = 0.0*max(q(i,j,1),0.d0)
              do m=2,meqn
                 q(i,j,m)=0.d0
                 enddo
