@@ -30,22 +30,21 @@ Z(ij) = min(Z(ij),zmax);
 
 
 % interpolate each value of Z array into zcolormap:
-ppR = interp1(zcolormap(:,1),zcolormap(:,2),'linear','pp');
-Rvalues = ppval(ppR, Z);
-ppG = interp1(zcolormap(:,1),zcolormap(:,3),'linear','pp');
-Gvalues = ppval(ppG, Z);
-ppB = interp1(zcolormap(:,1),zcolormap(:,4),'linear','pp');
-Bvalues = ppval(ppB, Z);
 
-if exist(discrete_colormap)
-	if (discrete_colormap==1)
-		ppR = interp1(zcolormap(:,1),zcolormap(:,2),'next','pp');
-		Rvalues = ppval(ppR, Z);
-		ppG = interp1(zcolormap(:,1),zcolormap(:,3),'next','pp');
-		Gvalues = ppval(ppG, Z);
-		ppB = interp1(zcolormap(:,1),zcolormap(:,4),'next','pp');
-		Bvalues = ppval(ppB, Z);
-	end
+if (exist('discrete_colormap')&discrete_colormap==1)
+	ppR = interp1(zcolormap(:,1),zcolormap(:,2),'next','pp');
+	Rvalues = ppval(ppR, Z);
+	ppG = interp1(zcolormap(:,1),zcolormap(:,3),'next','pp');
+	Gvalues = ppval(ppG, Z);
+	ppB = interp1(zcolormap(:,1),zcolormap(:,4),'next','pp');
+	Bvalues = ppval(ppB, Z);
+else
+    ppR = interp1(zcolormap(:,1),zcolormap(:,2),'linear','pp');
+    Rvalues = ppval(ppR, Z);
+    ppG = interp1(zcolormap(:,1),zcolormap(:,3),'linear','pp');
+    Gvalues = ppval(ppG, Z);
+    ppB = interp1(zcolormap(:,1),zcolormap(:,4),'linear','pp');
+    Bvalues = ppval(ppB, Z);
 end
 
 zcolors = nan([size(z) 3]);
