@@ -35,9 +35,9 @@ eta2colors(:,:,1) = eta2colors(:,:,1) .* dry_ind;
 hsurf=surf(X,Y,eta2.*covered_ind.*dry_ind,eta2colors); % Matlab has a bug regarding plotting edges--1/17/08 dlg
 
 if (PlotGrid(level)==1)
-    set(hsurf,'EdgeColor',[.5 .5 .5]);
+    set(hsurf,'FaceColor','interp','EdgeColor',[.5 .5 .5]);
 else
-    set(hsurf,'EdgeColor','none');
+    set(hsurf,'FaceColor','interp','EdgeColor','none');
 end
 
 hsurf.AlphaData = alpha_ind.*covered_ind;
