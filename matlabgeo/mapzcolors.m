@@ -38,7 +38,7 @@ ppB = interp1(zcolormap(:,1),zcolormap(:,4),'linear','pp');
 Bvalues = ppval(ppB, Z);
 
 if exist(discrete_colormap)
-	if discrete_colormap==1)
+	if (discrete_colormap==1)
 		ppR = interp1(zcolormap(:,1),zcolormap(:,2),'next','pp');
 		Rvalues = ppval(ppR, Z);
 		ppG = interp1(zcolormap(:,1),zcolormap(:,3),'next','pp');
