@@ -18,10 +18,13 @@ while ~exist('flow_colormap')
   disp('*** You must define flow_colormap, e.g. to one of the maps')
   disp('     defined in geo_setzcolormaps.m')
   break
-  end
+end
 
-
-eta2colors = mapzcolors(eta2color,flow_colormap);
+if exist('discrete_colormap')
+    eta2colors = mapzcolors(eta2color,flow_colormap,discrete_colormap);
+else
+    eta2colors = mapzcolors(eta2color,flow_colormap);
+end
 
 % set color to NaN in cells covered by finer grids:
 set_covered_ind
