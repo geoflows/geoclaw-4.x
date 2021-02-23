@@ -43,14 +43,15 @@ if PlotType == 13
 
     if mq==1
         eta2color = h2;
-    elseif mq==2
+    elseif ((mq==2)&(plotspeed==0))
         eta2color = hu2./h2;
-    elseif mq==3
+    elseif ((mq==3)&(plotspeed==0))
         eta2color = hv2./h2;
     elseif mq==4
         eta2color = eta2;
-    elseif mq==5
-        eta2color = sqrt((hu2./h2).^2 + (hv2./h2).^2);
+    elseif ((mq==2|mq==3)&(plotspeed==1))
+        hdiv = max(h2,1.e-3);
+        eta2color = sqrt((hu2./hdiv).^2 + (hv2./hdiv).^2);
     end
 
 
