@@ -1932,7 +1932,8 @@ def plotclaw_driver(plotdata, verbose=False):
 
     datadir = os.getcwd()  # assume data files in this directory
 
-    if not sys.modules.has_key('matplotlib'):
+    # if not sys.modules.has_key('matplotlib'):
+    if 'matplotlib' not in sys.modules:
         print('*** Error: matplotlib not found, no plots will be done')
         return plotdata
 
