@@ -17,7 +17,8 @@ from matplotlib.colors import Normalize
 
 plotter = 'matplotlib'
 if plotter == 'matplotlib':
-    if not sys.modules.has_key('matplotlib'):
+    # if not sys.modules.has_key('matplotlib'):
+    if 'matplotlib' not in sys.modules:
         try:
             import matplotlib
             matplotlib.use('Agg')  # Use an image backend
@@ -1265,8 +1266,8 @@ def printframes(plotdata=None, verbose=True):
     numframes = len(framenos)
 
     print("Will plot %i frames numbered:" % numframes, framenos)
-    print('Will make %i figure(s) for each frame, numbered: ' % len(fignos),\)
-          fignos
+    print('Will make %i figure(s) for each frame, numbered: ' % len(fignos),\
+          fignos)
 
     fignames = {}
     for figname in plotdata._fignames:
@@ -1531,8 +1532,8 @@ def only_most_recent(framenos,outdir='.',verbose=True):
 
     newframes = framekeys[:numframes]
     if (numframes < len(framekeys)) & verbose:
-        print('*** Frames %s and above appear to be from an old run' \)
-                       % framekeys[numframes]
+        print('*** Frames %s and above appear to be from an old run' \
+                       % framekeys[numframes])
         print('***    and will be ignored.')
         time.sleep(2)
 
