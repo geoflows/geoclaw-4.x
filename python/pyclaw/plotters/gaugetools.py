@@ -14,7 +14,8 @@ from pyclaw.plotters.frametools import set_show
 
 plotter = 'matplotlib'
 if plotter == 'matplotlib':
-    if not sys.modules.has_key('matplotlib'):
+    # if not sys.modules.has_key('matplotlib'):
+    if 'matplotlib' not in sys.modules:
         try:
             import matplotlib
             matplotlib.use('Agg')  # Use an image backend
@@ -42,8 +43,8 @@ def plotgauge(gaugeno, plotdata, verbose=False):
 
     if verbose:  
         gaugesoln = plotdata.getgauge(gaugeno)
-        print('    Plotting gauge %s  at x = %g, y = %g ... '  \)
-                 % (gaugeno, gaugesoln.x, gaugesoln.y)
+        print('    Plotting gauge %s  at x = %g, y = %g ... '  \
+                 % (gaugeno, gaugesoln.x, gaugesoln.y))
 
     if plotdata.mode() == 'iplotclaw':
         pylab.ion()
@@ -97,8 +98,8 @@ def plotgauge(gaugeno, plotdata, verbose=False):
     if plotdata._mode == 'iplotclaw':
         gaugesoln = plotdata.getgauge(gaugeno)
         #import pdb; pdb.set_trace()
-        print('    Plotting Gauge %s  at x = %g, y = %g ... '  \)
-                 % (gaugeno, gaugesoln.x, gaugesoln.y)
+        print('    Plotting Gauge %s  at x = %g, y = %g ... '  \
+                 % (gaugeno, gaugesoln.x, gaugesoln.y))
         requested_fignos = plotdata.iplotclaw_fignos
     else:
         requested_fignos = plotdata.print_fignos
@@ -683,8 +684,8 @@ def printgauges(plotdata=None, verbose=True):
     numframes = len(framenos)
 
     print("Will plot %i frames numbered:" % numframes, framenos)
-    print('Will make %i figure(s) for each frame, numbered: ' \)
-          % len(fignos_each_frame), fignos_each_frame
+    print('Will make %i figure(s) for each frame, numbered: ' \
+          % len(fignos_each_frame), fignos_each_frame)
 
     #fignames = {}
     #for figname in plotdata._fignames:
