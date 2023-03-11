@@ -144,6 +144,6 @@ def make_amrcolors(nlevels=4):
         linecolors = linecolors[:nlevels]
         bgcolors = bgcolors[:nlevels]
     else:
-        print "*** Warning, suggest nlevels <= 16"
+        print("*** Warning, suggest nlevels <= 16")
 
     return (linecolors, bgcolors)

@@ -63,12 +63,12 @@ class ClawPlotFGData(Data):
         pattern = "%s/fort.fg%s_*" % (self.outdir,str(self.fgno).zfill(2))
         files = glob.glob(pattern)
         if len(files) == 0:
-            print '*** No files found of form ', pattern
+            print('*** No files found of form ', pattern)
         framenos = []
         for file in files:
             line = open(file,'r').readline()
             t = float(line.split()[0])
-            print "%s: t = %s" % (file,t)
+            print("%s: t = %s" % (file,t))
             frameno = file[-2:]
             framenos.append(int(frameno))
         return framenos
@@ -83,7 +83,7 @@ class ClawPlotFGData(Data):
         fname = "fort.fg%s_%s" % (str(self.fgno).zfill(2), str(frameno).zfill(4))
         fname = os.path.join(self.outdir,fname)
         if not os.path.exists(fname):
-            print "*** Did not find file ",fname," in directory ",self.outdir
+            print("*** Did not find file ",fname," in directory ",self.outdir)
             raise IOError("Missing fixed grid output file")
         
 
@@ -96,8 +96,8 @@ class ClawPlotFGData(Data):
 
         line = file.readline()
         t = float(line.split()[0])
-        print "Reading fixed grid output from ",fname
-        print '   Frame %s at t = %s' % (frameno,t)
+        print("Reading fixed grid output from ",fname)
+        print('   Frame %s at t = %s' % (frameno,t))
 
         line = file.readline()
         grid.mx = int(line.split()[0])
@@ -147,7 +147,7 @@ class ClawPlotFGData(Data):
     def plotfg(self, frameno):
 
         grid, solution = self.get_frame(frameno)
-        print "Plotting frame %s at time t = %s"  % (frameno,solution.t)
+        print("Plotting frame %s at time t = %s"  % (frameno,solution.t))
 
     
         # Define function to plot topo contours for use in multiple places:
@@ -193,7 +193,7 @@ class ClawPlotFGData(Data):
             fname = 'FixedGrid%sFrame%sfig%s.png' \
                 %  (str(self.fgno).zfill(2), str(frameno).zfill(4), figno)
             savefig(fname)
-            print "Saved figure as ",fname
+            print("Saved figure as ",fname)
         
         
         if solution.ncols > 5:
@@ -248,7 +248,7 @@ class ClawPlotFGData(Data):
                 fname = 'FixedGrid%sFrame%sfig%s.png' \
                     %  (str(self.fgno).zfill(2), str(frameno).zfill(4), figno)
                 savefig(fname)
-                print "Saved figure as ",fname
+                print("Saved figure as ",fname)
         
         #---------------------------------------------------------------
 
@@ -281,7 +281,7 @@ class ClawPlotFGData(Data):
                 fname = 'FixedGrid%sFrame%sfig%s.png' \
                     %  (str(self.fgno).zfill(2), str(frameno).zfill(4), figno)
                 savefig(fname)
-                print "Saved figure as ",fname
+                print("Saved figure as ",fname)
                 
             
         
@@ -295,7 +295,7 @@ class ClawPlotFGData(Data):
             if ans=='s':
                 fname = 'FixedGrid%sFrame%s.png' %  (str(self.fgno).zfill(2), str(frameno).zfill(4))
                 savefig(fname)
-                print "Saved figure as ",fname
+                print("Saved figure as ",fname)
                 ans = raw_input("Hit return for next time, q to quit, s to savefig... ")
                 
             if ans=='q':
