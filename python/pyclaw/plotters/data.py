@@ -1373,7 +1373,7 @@ def make_amrclawdatafile(clawdata):
     data_write(file, clawdata, 'maux', '(number of aux variables)')
     if len(clawdata.auxtype) != clawdata.maux:
         file.close()
-        raise AttributeError, "require len(clawdata.auxtype) == clawdata.maux"
+        raise AttributeError("require len(clawdata.auxtype) == clawdata.maux")
     for i in range(clawdata.maux):
         file.write("'%s'\n" % clawdata.auxtype[i])
     data_write(file, clawdata, None)
@@ -1414,18 +1414,18 @@ def make_amrclawdatafile(clawdata):
     data_write(file, clawdata, 'cutoff', '(efficiency cutoff for grid gen.)')
     data_write(file, clawdata, None)
 
-    data_write(file, clawdata, 'PRINT', '(print(to fort.amr)'))
+    data_write(file, clawdata, 'PRINT', '(print to fort.amr)')
     data_write(file, clawdata, 'NCAR', '(obsolete!)')
     data_write(file, clawdata, 'fortq', '(Output to fort.q* files)')
     data_write(file, clawdata, None)
 
-    data_write(file, clawdata, 'dprint', '(print(domain flags)'))
-    data_write(file, clawdata, 'eprint', '(print(err est flags)'))
+    data_write(file, clawdata, 'dprint', '(print domain flags)')
+    data_write(file, clawdata, 'eprint', '(print err est flags)')
     data_write(file, clawdata, 'edebug', '(even more err est flags)')
     data_write(file, clawdata, 'gprint', '(grid bisection/clustering)')
     data_write(file, clawdata, 'nprint', '(proper nesting output)')
     data_write(file, clawdata, 'pprint', '(proj. of tagged points)')
-    data_write(file, clawdata, 'rprint', '(print(regridding summary)'))
+    data_write(file, clawdata, 'rprint', '(print regridding summary)')
     data_write(file, clawdata, 'sprint', '(space/memory output)')
     data_write(file, clawdata, 'tprint', '(time step reporting each level)')
     data_write(file, clawdata, 'uprint', '(update/upbnd reporting)')
