@@ -32,7 +32,10 @@ Authors: Dave George and Randy LeVeque
 import numpy as np
 import os
 import string
-from datatools import *
+import sys
+
+# from datatools import *
+sys.path.append("datatools")
 
 # These don't seem to be needed now...  but maybe missed something.
 # Best to not import * to avoid cluttering up namespace.
