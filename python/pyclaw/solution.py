@@ -168,14 +168,14 @@ class Dimension(object):
             self.lower = float(args[0])
             self.upper = float(args[1])
             self.n = int(args[2])
-    	elif isinstance(args[0],basestring):
+        elif isinstance(args[0],basestring):
             self.name = args[0]
             self.lower = float(args[1])
             self.upper = float(args[2])
             self.n = int(args[3])
-    	else:
+        else:
     	    raise Exception("Invalid initializer for Dimension.")
-        
+            
         for (k,v) in kargs.iteritems():
             setattr(self,k,v)
             
