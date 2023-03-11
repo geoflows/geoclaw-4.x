@@ -196,11 +196,11 @@ def plots2html(plot_pages_data):
     else:
         html.write('<html><meta http-equiv="expires" content="0">')
         html.write('\n<title>%s</title>' % ppd.html_index_title)
-        html.write('\n<body><center><h1>%s</h1></center>\n' \
-                   % ppd.html_index_title)
-	homelink = getattr(ppd,'html_homelink',None)
+        html.write('\n<body><center><h1>%s</h1></center>\n' % ppd.html_index_title)
+        homelink = getattr(ppd,'html_homelink',None)
+
         if homelink:
-	    html.write('<center><a href="%s">Back to %s</a></center>\n' \
+	        html.write('<center><a href="%s">Back to %s</a></center>\n' \
 	               % (homelink, homelink))
 
     html.write('<p>\n')
@@ -389,9 +389,9 @@ def timeframes2html(plot_pages_data):
         html.write('\n<title>%s</title>\n<body>' % ppd.html_index_title)
         html.write('\n<center><h1>%s</h1></center>\n' \
                    % ppd.html_index_title)
-	homelink = getattr(ppd,'html_homelink',None)
+        homelink = getattr(ppd,'html_homelink',None)
         if homelink:
-	    html.write('<center><a href="%s">Back to %s</a></center>\n' \
+	        html.write('<center><a href="%s">Back to %s</a></center>\n' \
 	               % (homelink, homelink))
 
     html.write('<p>\n')
@@ -866,8 +866,8 @@ def plots2latex(plot_pages_data):
     if ppd.latex_makepdf:
         try:
             os.system('pdflatex %s' % ppd.latex_fname)
-            print("\nSuccessfully created pdf file:  %s/%s.pdf" \)
-                   % (plotdir, ppd.latex_fname)
+            print("\nSuccessfully created pdf file:  %s/%s.pdf" \
+                   % (plotdir, ppd.latex_fname))
         except:
             print('*** pdflatex command failed')
 
@@ -1156,8 +1156,8 @@ def timeframes2latex(plot_pages_data):
             os.system('pdflatex %s' % ppd.latex_fname)
         except:
             print('*** pdflatex command failed')
-        print("\nSuccessfully created pdf file:  %s/%s.pdf" \)
-                % (plotdir, ppd.latex_fname)
+        print("\nSuccessfully created pdf file:  %s/%s.pdf" \
+                % (plotdir, ppd.latex_fname))
 
     os.chdir(startdir)
     # end of timeframes2latex
@@ -1346,9 +1346,9 @@ def plotclaw2html(plotdata):
         html.write('\n<title>%s</title>' % plotdata.html_index_title)
         html.write('\n<body><center><h1>%s</h1></center>\n' \
                    % plotdata.html_index_title)
-	homelink = getattr(plotdata,'html_homelink',None)
+        homelink = getattr(plotdata,'html_homelink',None)
         if homelink:
-	    html.write('<center><a href="%s">Back to %s</a></center>\n' \
+	        html.write('<center><a href="%s">Back to %s</a></center>\n' \
 	               % (homelink, homelink))
 
     html.write('<p>\n')
@@ -2067,8 +2067,8 @@ def plotclaw_driver(plotdata, verbose=False):
     numframes = len(framenos)
 
     print("Will plot %i frames numbered:" % numframes, framenos)
-    print('Will make %i figure(s) for each frame, numbered: ' \)
-          % len(fignos_each_frame), fignos_each_frame
+    print('Will make %i figure(s) for each frame, numbered: ' \
+          % len(fignos_each_frame), fignos_each_frame)
 
     #fignames = {}
     #for figname in plotdata._fignames:
