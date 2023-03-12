@@ -1,4 +1,3 @@
-
 """
 Generic code for plotting Clawpack results.
 
@@ -17,22 +16,25 @@ will call the plotclaw function from this module.
 
 """
 
-import sys, os
+import os
+import glob
+import sys
+
+import matplotlib
 
 # Use the Agg backend for plotting -- this doesn't require opening windows
 # when plotting remotely.
 
-import matplotlib
-matplotlib.use('Agg')
-import pylab
 
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 
-if sys.platform in ['win32','cygwin']:
-    pypath = 'C:/cygwin' + os.environ['CLAW'] + '/python'
+if sys.platform in ["win32", "cygwin"]:
+    pypath = "C:/cygwin" + os.environ["CLAW"] + "/python"
     sys.path.append(pypath)
 
 
-def plotclaw(outdir='.', plotdir='_plots', setplot = 'setplot.py'):
+def plotclaw(outdir=".", plotdir="_plots", setplot="setplot.py"):
     """
     Create html and/or latex versions of plots.
 
@@ -41,24 +43,28 @@ def plotclaw(outdir='.', plotdir='_plots', setplot = 'setplot.py'):
                 to set various plotting parameters.
     """
 
-    from pyclaw.plotters.data import ClawPlotData
     from pyclaw.plotters import plotpages
+    from pyclaw.plotters.data import ClawPlotData
 
-    plotdata = ClawPlotData()
+    data_file_search = os.path.abspath(os.path.join(outdir, "*.data"))
+    data_files = glob.glob(data_file_search)
+    plotdata = ClawPlotData(data_files=data_files)
     plotdata.outdir = outdir
     plotdata.plotdir = plotdir
     plotdata.setplot = setplot
 
     plotpages.plotclaw_driver(plotdata, verbose=False)
 
-#----------------------------------------------------------
 
-if __name__=='__main__':
+# ----------------------------------------------------------
+
+if __name__ == "__main__":
     """
     If executed at command line prompt, simply call the function, with
     any arguments passed in.
     """
     import sys
+
     if len(sys.argv) == 4:
         plotclaw(sys.argv[1], sys.argv[2], sys.argv[3])
     elif len(sys.argv) == 3:

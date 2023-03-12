@@ -10,12 +10,15 @@ For options during looping type:
 
 """
 
-import cmd, os, sys, string
+import cmd
+import os
+import string
+import sys
 
-
-if not sys.modules.has_key('matplotlib'):
+if 'matplotlib' not in sys.modules:
     try:
         import matplotlib
+
         # Override system defaults before importing pylab
         # If you set the backend here, you must start ipython w/o pylab
         # before importing this package.
@@ -66,7 +69,7 @@ class Iplotclaw(cmd.Cmd):
     Other arguments of Iplotclaw rarely need to be changed:
        completekey='tab', stdin=None, stdout=None
     """
-    from pyclaw.plotters import frametools, data
+    from pyclaw.plotters import data, frametools
 
     # initialization:
     # ---------------
@@ -119,8 +122,8 @@ class Iplotclaw(cmd.Cmd):
             plotdata = frametools.call_setplot(self.setplot,plotdata)
         except:
             print('*** Problem executing setplot in Iplotclaw')
-            #print('    plotdata = ', plotdata)
-            print('    setplot = ', self.setplot)
+            #print '    plotdata = ', plotdata
+            print(('    setplot = ', self.setplot))
             print('*** Either this file does not exist or ')
             print('    there is a problem executing the function setplot in this file.')
             print('*** PLOT PARAMETERS MAY NOT BE SET! ***')
@@ -135,11 +138,11 @@ class Iplotclaw(cmd.Cmd):
     def preloop(self):
 
         print('\nInteractive plotting for Clawpack output... ')
-        print('\nPlotting data from outdir = ', self.plotdata.outdir)
+        print(('\nPlotting data from outdir = ', self.plotdata.outdir))
         print('Type ? at PLOTCLAW prompt for list of commands')
 
-        startframeno = raw_input('\n    Start at which frame [default=%i] ? '\
-                                % self.prevframeno)
+        startframeno = eval(input('\n    Start at which frame [default=%i] ? '\
+                                % self.prevframeno))
 
         makeplot = True 
 
@@ -147,15 +150,15 @@ class Iplotclaw(cmd.Cmd):
             self.frameno = self.prevframeno
             self.plotdata = self.prevplotdata
             if self.restart:
-                replot = raw_input('    Replot data for frame %s [no] ? ' \
-                                % self.frameno)
+                replot = eval(input('    Replot data for frame %s [no] ? ' \
+                                % self.frameno))
 
                 if replot not in ['y','yes','Y']:
                     makeplot = False
 
                 if makeplot:
-                    reload = raw_input('    Reload data for frame %s [no] ? ' \
-                                    % self.frameno)
+                    reload = eval(input('    Reload data for frame %s [no] ? ' \
+                                    % self.frameno))
                     if reload in ['y','yes','Y']:
                         self.plotdata.refresh_frames = True
                     else:
@@ -201,8 +204,9 @@ class Iplotclaw(cmd.Cmd):
     # next frame:
     # -----------
     def do_n(self, rest):
-        from pyclaw.plotters import frametools, data
-        #print('    frameno = ',self.frameno)
+        from pyclaw.plotters import data, frametools
+
+        #print '    frameno = ',self.frameno
         self.frameno = self.frameno+1
 	self.current_data = frametools.plotframe(self.frameno, self.plotdata)
         pylab.draw()
@@ -212,7 +216,7 @@ class Iplotclaw(cmd.Cmd):
     # previous frame:
     # ---------------
     def do_p(self, rest):
-        #print('    frameno = ',self.frameno)
+        #print '    frameno = ',self.frameno
         self.frameno = max(self.frameno-1, 0)
         self.current_data = frametools.plotframe(self.frameno, self.plotdata)
     def help_p(self):
@@ -224,7 +228,7 @@ class Iplotclaw(cmd.Cmd):
         try:
             newframeno = int(rest)
         except:
-            newframeno = raw_input('\n    Jump to which frame? ')
+            newframeno = eval(input('\n    Jump to which frame? '))
         if newframeno == 'n': 
             self.do_n(rest)
             self.lastcmd = 'n'
@@ -238,7 +242,7 @@ class Iplotclaw(cmd.Cmd):
                 self.current_data = frametools.plotframe(self.frameno, self.plotdata)
             except:
                 print('\n    *** Error: frameno must be an integer, n, or p')
-                #print('\n Requested frameno = %s  %s' %(newframeno,type(newframeno)))
+                #print '\n Requested frameno = %s  %s' %(newframeno,type(newframeno))
     def help_j(self):
         print('j N: jump to frame N\n')
         print('j:   jump to some other frame (will prompt for N)\n')
@@ -256,10 +260,10 @@ class Iplotclaw(cmd.Cmd):
         key = (self.frameno, outdir)
         xxx = self.plotdata.framesoln_dict.pop(key,None)
         if xxx is None:
-           print('No frame data to clear for frame ',self.frameno)
+           print(('No frame data to clear for frame ',self.frameno))
         else:
-           print('Cleared data for frame ',self.frameno)
-        print('Reading data from outdir = ',self.plotdata.outdir)
+           print(('Cleared data for frame ',self.frameno))
+        print(('Reading data from outdir = ',self.plotdata.outdir))
         self.current_data = frametools.plotframe(self.frameno, self.plotdata)
         self.plotdata.refresh_frames=False
     def help_rr(self):
@@ -270,9 +274,9 @@ class Iplotclaw(cmd.Cmd):
     def do_resetplot(self, rest):
         if rest:
             self.setplot = rest
-            print('*** Resetting setplot to: ',rest)
+            print(('*** Resetting setplot to: ',rest))
             self.plotdata.setplot = self.setplot
-        print('Executing setplot from ',self.setplot)
+        print(('Executing setplot from ',self.setplot))
         try:
             plotdata = frametools.call_setplot(self.setplot,self.plotdata)
         except:
@@ -310,9 +314,9 @@ class Iplotclaw(cmd.Cmd):
                     key = (frameno, outdir)
                     xxx = self.plotdata.framesoln_dict.pop(key,None)
                     if xxx is None:
-                       print('No frame data to clear for frame ',frameno)
+                       print(('No frame data to clear for frame ',frameno))
                     else:
-                       print('Cleared data for frame ',frameno)
+                       print(('Cleared data for frame ',frameno))
             except:
                 print('Error in clearframes: unrecognized input')
 
@@ -345,34 +349,34 @@ class Iplotclaw(cmd.Cmd):
             try:
                 figno = int(rest[0])
             except:
-                print("*** Expected figure number, got: ",rest[0])
+                print(("*** Expected figure number, got: ",rest[0]))
             try:
                 fname = rest[1]
                 pylab.figure(figno)
                 pylab.savefig(fname)
-                print("Saved figure number %s to file %s" % (figno,fname))
+                print(("Saved figure number %s to file %s" % (figno,fname)))
             except:
                 print("*** Problem executing savefig")
         else:
             print("*** save requires two arguments: figno, fname")
-            print("*** got: ",rest)
+            print(("*** got: ",rest))
 
     def help_save(self):
         print('save figno fname: save figure figno to file fname using savefig.')
 
 
-    # print(working directory:)
+    # print working directory:
     # ------------------------
     def do_pwd(self, rest):
-        print('  now in directory: ',os.getcwd())
-        print('  data from outdir: ',self.plotdata.outdir)
+        print(('  now in directory: ',os.getcwd()))
+        print(('  data from outdir: ',self.plotdata.outdir))
     def help_pwd(self):
         print('pwd: print current working directory and outdir')
         print('     fort.* files in outdir provide frame data\n')
 
 
 
-    # print(figure to a file:)
+    # print figure to a file:
     # -----------------------
     def do_print(self, rest):
         #from pyclaw.plotters import frametools
@@ -442,19 +446,19 @@ class Iplotclaw(cmd.Cmd):
                     print('*** Error reading gauges in Iplotclaw')
                     gauges = {}
 
-                #print('+++ gauges.keys = ',gauges.keys())
-                #print('+++ gaugesoln_dict = ',gaugesoln_dict)
+                #print '+++ gauges.keys = ',gauges.keys()
+                #print '+++ gaugesoln_dict = ',gaugesoln_dict
                 try:
-                    for (k,v) in gauges.iteritems():
+                    for (k,v) in list(gauges.items()):
                         gaugesoln_dict[(k, outdir)] = v
                 except:
                     raise Exception("*** Problem setting gaugesoln_dict in Iplotclaw")
 
             if len(gaugesoln_dict) > 0:
-                keys = gaugesoln_dict.keys()
-                #print('+++ keys = ',keys)
+                keys = list(gaugesoln_dict.keys())
+                #print '+++ keys = ',keys
                 gaugenos = set([keys[k][0] for k in range(len(keys))])
-                #print('+++ gaugenos = ',gaugenos)
+                #print '+++ gaugenos = ',gaugenos
                 gaugenos = list(gaugenos)
                 gaugenos.sort()
                 n = 0
@@ -464,9 +468,9 @@ class Iplotclaw(cmd.Cmd):
                     try:
                         gaugetools.plotgauge(gaugeno, self.plotdata)
                     except:
-                        print("*** Problem executing gaugetools.plotgauge with gaugeno = ", gaugeno)
+                        print(("*** Problem executing gaugetools.plotgauge with gaugeno = ", gaugeno))
                     if n < len(gaugenos)-1:
-                        ans = raw_input("      Hit return for next gauge or q to quit ")
+                        ans = eval(input("      Hit return for next gauge or q to quit "))
                     n = n+1
 
         else:
@@ -581,7 +585,7 @@ class Iplotclaw(cmd.Cmd):
         if len(plotdata.otherfigure_dict)==0:
             print("No other figures specified.")
         else:
-            for name in plotdata.otherfigure_dict.iterkeys():
+            for name in list(plotdata.otherfigure_dict.keys()):
                 otherfigure = plotdata.otherfigure_dict[name]
                 fname = otherfigure.fname
                 makefig = otherfigure.makefig
@@ -591,16 +595,16 @@ class Iplotclaw(cmd.Cmd):
                             exec(makefig)
                         except:
                             print("*** Problem executing makefig ")
-                            print("    for otherfigure ",name)
+                            print(("    for otherfigure ",name))
                             import pdb; pdb.set_trace()
                     else:
                         try:
                             makefig(plotdata)
                         except:
                             print("*** Problem executing makefig function")
-                            print("    for otherfigure ",name)
+                            print(("    for otherfigure ",name))
                 else:
-                    print("No makefig function specified for ",name)
+                    print(("No makefig function specified for ",name))
 
 
 
