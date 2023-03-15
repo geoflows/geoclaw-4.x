@@ -50,14 +50,14 @@ if outstyle == 3:
     total_steps = 1000   # ... for a total of 500 steps (so 50 output files total)
 
 #-------------------  Computational coarse grid ---------------------------------------
-mx = 16
-my = 16
+mx = 32
+my = 32
 
-minlevel = 2
-maxlevel = 5 #resolution based on levels 
-ratios_x = [2]*(maxlevel-1)
-ratios_y = [2]*(maxlevel-1)
-ratios_t = [2]*(maxlevel-1)
+minlevel = 1
+maxlevel = 3 #resolution based on levels 
+ratios_x = [4]*(maxlevel-1)
+ratios_y = [4]*(maxlevel-1)
+ratios_t = [4]*(maxlevel-1)
 
 #-------------------manning coefficient -----------------------------------------------
 manning_coefficient = 0.03333
@@ -236,11 +236,11 @@ def setrun(claw_pkg='geoclaw'):
         clawdata.iout = [iout, ntot]
 
 
-    # clawdata.output_format = 'ascii'      # 'ascii' or 'netcdf'
+    clawdata.output_format = 'ascii'      # 'ascii' or 'netcdf'
 
-    # clawdata.output_q_components = 'all'   # could be list such as [True,True]
-    # clawdata.output_aux_components = 'none'  # could be list
-    # clawdata.output_aux_onlyonce = True    # output aux arrays only at t0
+    clawdata.output_q_components = 'all'   # could be list such as [True,True]
+    clawdata.output_aux_components = 'none'  # could be list
+    clawdata.output_aux_onlyonce = True    # output aux arrays only at t0
 
 
 
@@ -272,7 +272,7 @@ def setrun(claw_pkg='geoclaw'):
 
     # Desired Courant number if variable dt used, and max to allow without
     # retaking step with a smaller dt:
-    clawdata.cfl_desired = 0.25
+    clawdata.cfl_desired = 0.75
     clawdata.cfl_max = 0.99
 
     # Maximum number of time steps to allow between output times:
@@ -283,10 +283,10 @@ def setrun(claw_pkg='geoclaw'):
     # ------------------
 
    # Order of accuracy:  1 => Godunov,  2 => Lax-Wendroff plus limiters
-    clawdata.order = 1
+    clawdata.order = 2
 
     # Transverse order for 2d or 3d (not used in 1d):
-    clawdata.order_trans = 0
+    clawdata.order_trans = 2
 
     # Number of waves in the Riemann solution:
     clawdata.mwaves = 3
@@ -328,14 +328,14 @@ def setrun(claw_pkg='geoclaw'):
 
 
     # max number of refinement levels:
-    mxnest = 3
+    mxnest = maxlevel
 
     clawdata.mxnest = -mxnest   # negative ==> anisotropic refinement in x,y,t
 
     # List of refinement ratios at each level (length at least mxnest-1)
-    clawdata.inratx = [4,4]
-    clawdata.inraty = [4,4]
-    clawdata.inratt = [4,4]
+    clawdata.inratx = ratios_x
+    clawdata.inraty = ratios_y
+    clawdata.inratt = ratios_t
 
     # Instead of setting inratt ratios, set:
     # geodata.variable_dt_refinement_ratios = True
@@ -361,6 +361,16 @@ def setrun(claw_pkg='geoclaw'):
     clawdata.checkpt_iousr = 10000000
     clawdata.restart = False
     # More AMR parameters can be set -- see the defaults in pyclaw/data.py
+
+
+    clawdata.fortq = False  # output fort.q* files
+    # clawdata.tprint = True  # time step reporting each level
+    # clawdata.rprint = True  #  print regridding summary
+    # clawdata.uprint = True  #  update/upbnd reporting
+    # clawdata.PRINT = True  # grid bisection/clustering report
+
+
+
 
     return rundata
     # end of function setrun
@@ -394,9 +404,9 @@ def setgeo(rundata):
     # == settsunami.data values ==
     geodata.sealevel = 0.0
     geodata.drytolerance = 1.e-3
-    geodata.wavetolerance = 5.e-2 #for use with tsunami modeling. ignored when using flowgrades
+    geodata.wavetolerance = 5.e-3 #for use with tsunami modeling. ignored when using flowgrades
     geodata.depthdeep = 1.e2 #for use with tsunami modeling. ignored when using flowgrades
-    geodata.maxleveldeep = 1 #for use with tsunami modeling. ignored when using flowgrades
+    geodata.maxleveldeep = maxlevel #for use with tsunami modeling. ignored when using flowgrades
     geodata.ifriction = 1 #use friction?
     geodata.coeffmanning = manning_coefficient
     geodata.frictiondepth = 10000.0 #friction only applied with depths less than this

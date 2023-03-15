@@ -70,15 +70,16 @@ def setplot(plotdata):
     # Water
     plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
     #plotitem.plot_var = geoplot.surface
-    geoplot.depth   # Plot height field h.
-    # plotitem.pcolor_cmap = geoplot.googleearth_flooding
+    # geoplot.depth   # Plot height field h.
+    plotitem.pcolor_cmap = geoplot.flooding
     # plotitem.plot_var = geoplot.surface_or_depth
-    plotitem.pcolor_cmap = geoplot.tsunami_colormap
+    # plotitem.pcolor_cmap = geoplot.tsunami_colormap
     plotitem.pcolor_cmin = cmin
     plotitem.pcolor_cmax = cmax
     plotitem.add_colorbar = True
     plotitem.amr_gridlines_show = [1,0,0,0,0]
     plotitem.gridedges_show = 1
+    plotitem.patchedges_show = True       # Show patch edges
 
     # Land
     # plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
@@ -163,12 +164,12 @@ def setplot(plotdata):
     plotdata.print_framenos = 'all'          # list of frames to print
     plotdata.print_gaugenos = 'all'        # list of gauges to print
     plotdata.print_fignos = 'all'            # list of figures to print
-    plotdata.html = True                     # create html files of plots?
+    plotdata.html = False                    # create html files of plots?
     plotdata.html_homelink = '../README.html'   # pointer for top of index
     plotdata.latex = True                    # create latex file of plots?
     plotdata.latex_figsperline = 2           # layout of plots
     plotdata.latex_framesperline = 1         # layout of plots
-    plotdata.latex_makepdf = False           # also run pdflatex?
+    plotdata.latex_makepdf = True           # also run pdflatex?
 
     return plotdata
 

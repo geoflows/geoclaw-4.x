@@ -27,8 +27,45 @@ brown = [0.9, 0.8, 0.2]
 gray8 = [0.8, 0.8, 0.8]
 purple = [0.8, 0.3, 0.8]
 
+transparent = [0.0, 0.0, 0.0,0.0]
+blue_a = [0.0,0.0,1.0,1.0]
+red_a = [1.0,0.0,0.0,1.0]
+light_green_a = [0.0,1.0,1.0,1.0]
+white_a = [1.0,1.0,1.0,1.0]
+
+#Colors taken from Google Earth
+biscay = '#203469'   # Dark blue
+lightblue = '#4E6498'
+
 # Colormaps
 TSUNAMI_MAX_AMPLITUDE = 0.6
+googleearth_lightblue = colormaps.make_colormap({-TSUNAMI_MAX_AMPLITUDE:blue_a,
+                                                 0.0:lightblue,
+                                                 TSUNAMI_MAX_AMPLITUDE:red_a})
+
+googleearth_darkblue = colormaps.make_colormap({-TSUNAMI_MAX_AMPLITUDE:blue_a,
+                                                0.0:biscay,
+                                                TSUNAMI_MAX_AMPLITUDE:red_a})
+
+
+googleearth_white = colormaps.make_colormap({-TSUNAMI_MAX_AMPLITUDE:blue_a,
+                                                0.0:white_a,
+                                                TSUNAMI_MAX_AMPLITUDE:red_a})
+
+
+googleearth_transparent = colormaps.make_colormap({-1.0:light_green_a,
+                                                   0.0:transparent,
+                                                   1.0:red_a})
+
+# Start transparency at 0.2
+googleearth_flooding = colormaps.make_colormap({ -1:transparent,
+                                                 -0.2:light_blue,
+                                                 1.0:dark_blue})
+
+flooding = colormaps.make_colormap({ -1:white,
+                                    -0.2:light_blue,
+                                    1.0:dark_blue})
+
 tsunami_colormap = colormaps.make_colormap(
     {-TSUNAMI_MAX_AMPLITUDE: blue, 0.0: blue_green, TSUNAMI_MAX_AMPLITUDE: red}
 )
