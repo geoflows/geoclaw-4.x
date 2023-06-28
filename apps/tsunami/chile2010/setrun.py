@@ -260,7 +260,7 @@ def setgeo(rundata):
     try:
         geodata = rundata.geodata
     except:
-        print "*** Error, this rundata has no geodata attribute"
+        print( "*** Error, this rundata has no geodata attribute")
         raise AttributeError("Missing geodata attribute")
 
     # == setgeo.data values ==
@@ -332,9 +332,9 @@ if __name__ == '__main__':
     # Set up run-time parameters and write all data files.
     import sys
     if len(sys.argv) == 2:
-	rundata = setrun(sys.argv[1])
+	    rundata = setrun(sys.argv[1])
     else:
-	rundata = setrun()
+	    rundata = setrun()
 
     rundata.write()
 

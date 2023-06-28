@@ -44,11 +44,11 @@ def runclaw(xclawcmd=None, outdir=None, overwrite=True, restart=False,
     if rundir is None:
         rundir = os.getcwd()
     rundir = os.path.abspath(rundir)
-    print "Will take data from ", rundir
+    print ("Will take data from ", rundir)
 
     # directory for fort.* files:
     outdir = os.path.abspath(outdir)
-    print '== runclaw: Will write output to ',outdir
+    print ('== runclaw: Will write output to ',outdir)
     
     clawjob = Controller()
     clawjob.xdir = os.getcwd()
@@ -60,9 +60,9 @@ def runclaw(xclawcmd=None, outdir=None, overwrite=True, restart=False,
     
     returncode = clawjob.runxclaw()
     if returncode != 0:
-        print '== runclaw: *** fortran returncode = ', returncode, '   aborting'
-    print '== runclaw: Done executing %s via pyclaw.runclaw.py' % xclawcmd
-    print '== runclaw: Output is in ', outdir
+        print ('== runclaw: *** fortran returncode = ', returncode, '   aborting')
+    print ('== runclaw: Done executing %s via pyclaw.runclaw.py' % xclawcmd)
+    print ('== runclaw: Output is in ', outdir)
     
 
 #----------------------------------------------------------

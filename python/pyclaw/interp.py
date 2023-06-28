@@ -15,13 +15,13 @@ def pwcubic(xi, zl, zr, slopel, sloper, x):
         zr[i] = value of z in limit as x approaches xi[i] from the right,
         slopel[i] = value of z'(x) in limit as x approaches xi[i] from the left,
         sloper[i] = value of z'(x) in limit as x approaches xi[i] from the right.
-    To the left of xi[0] the linear function based on 
+    To the left of xi[0] the linear function based on
        zl[0] and slopel[0] is used.
-    To the right of xi[-1] the linear function based on 
+    To the right of xi[-1] the linear function based on
        zr[-1] and sloper[-1] is used.
 
-    In the interior intervals a cubic us used that interpolates 
-    the 4 values at the ends of the interval.  
+    In the interior intervals a cubic us used that interpolates
+    the 4 values at the ends of the interval.
 
     Note that the function will be linear in the i'th interval if
         sloper[i]   = (zl[i+1] - zr[i]) / (xi[i+1] - xi[i])
@@ -42,17 +42,21 @@ def pwcubic(xi, zl, zr, slopel, sloper, x):
 
     s = (zl[1:] - zr[:-1]) / dx
     c2 = (s - sloper[:-1]) / dx
-    c3 = (slopel[1:] - 2.*s + sloper[:-1]) / (dx**2)
+    c3 = (slopel[1:] - 2.0 * s + sloper[:-1]) / (dx ** 2)
 
     # set to linear function for x<xi[0] or x>= xi[-1]
-    z = where(x < xi[0],  zl[0] + (x-xi[0]) * slopel[0], 
-                          zr[-1] + (x-xi[-1]) * sloper[-1])
+    z = where(
+        x < xi[0], zl[0] + (x - xi[0]) * slopel[0], zr[-1] + (x - xi[-1]) * sloper[-1]
+    )
 
     # replace by appropriate cubic in intervals:
-    for i in range(len(xi)-1):
-        cubic = zr[i] + sloper[i]*(x - xi[i]) \
-                    + (x-xi[i])**2 * (c2[i] + c3[i]*(x-xi[i+1]))
-        z = where((x >= xi[i]) & (x < xi[i+1]), cubic, z)
+    for i in range(len(xi) - 1):
+        cubic = (
+            zr[i]
+            + sloper[i] * (x - xi[i])
+            + (x - xi[i]) ** 2 * (c2[i] + c3[i] * (x - xi[i + 1]))
+        )
+        z = where((x >= xi[i]) & (x < xi[i + 1]), cubic, z)
 
     return z
 
@@ -70,14 +74,14 @@ def pwlinear(xi, zl, zr, x, extrap=0):
     """
 
     from numpy import zeros
+
     slopel = zeros(len(zl))
     sloper = zeros(len(zr))
     dx = xi[1:] - xi[:-1]
-    slopel[1:]  = (zl[1:]-zr[:-1]) / dx
+    slopel[1:] = (zl[1:] - zr[:-1]) / dx
     sloper[:-1] = slopel[1:]
-    if extrap==1:
+    if extrap == 1:
         slopel[0] = sloper[0]
         sloper[-1] = slopel[-1]
     z = pwcubic(xi, zl, zr, slopel, sloper, x)
     return z
-

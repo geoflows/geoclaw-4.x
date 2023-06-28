@@ -22,7 +22,7 @@ CLAW_PLOTDIR = _plots               # Directory for plots
 # Environment variable FC should be set to fortran compiler, e.g. gfortran
 FC ?= gfortran   # default if not set as environment variable
 # Add any desired compiler flags such as -g here:
-FFLAGS ?=  -O2 
+FFLAGS ?=  -fopenmp -O2 -fbounds-check -ffpe-trap=invalid,overflow,zero
 
 
 # ---------------------------------
@@ -39,6 +39,8 @@ GEOLIB = $(CLAW)/geoclaw/2d/lib
 CLAW_LIBSOURCES = \
   $(GEOLIB)/geoclaw_mod.f90 \
   $(GEOLIB)/topo_mod.f90 \
+  $(GEOLIB)/qinit_mod.f90 \
+  $(GEOLIB)/auxinit_mod.f90 \
   $(GEOLIB)/dtopo_mod.f90 \
   $(GEOLIB)/setprob_geo.f \
   $(GEOLIB)/qinit_geo.f \

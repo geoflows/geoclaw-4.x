@@ -2,35 +2,39 @@
 Tools for plotting data from gauges, gauge locations, etc.
 """
 
-import os,sys,shutil,glob
-import string,re
+import glob
+import os
+import re
+import shutil
+import string
+import sys
 import time
 import traceback
 
+import numpy as np
 
 from pyclaw.data import Data
-from pyclaw.plotters import plotpages
-from pyclaw.plotters.frametools import set_show
+from pyclaw.plotters import frametools, plotpages
 
-plotter = 'matplotlib'
-if plotter == 'matplotlib':
-    if not sys.modules.has_key('matplotlib'):
+plotter = "matplotlib"
+if plotter == "matplotlib":
+    if "matplotlib" not in sys.modules:
         try:
             import matplotlib
-            matplotlib.use('Agg')  # Use an image backend
+
+            matplotlib.use("Agg")  # Use an image backend
         except:
-            print "*** Error: problem importing matplotlib"
+            print("*** Error: problem importing matplotlib")
 
 try:
-    import pylab
+    import matplotlib.pyplot as plt
 except:
-    print "*** Error: problem importing pylab"
+    print("*** Error: problem importing matplotlib.pyplot")
 
 
-
-#==========================================
+# ==========================================
 def plotgauge(gaugeno, plotdata, verbose=False):
-#==========================================
+    # ==========================================
 
     """
     Plot all requested plots for a single gauge from the computation.
@@ -39,43 +43,46 @@ def plotgauge(gaugeno, plotdata, verbose=False):
 
     """
 
-
-    if verbose:  
+    if verbose:
         gaugesoln = plotdata.getgauge(gaugeno)
-        print '    Plotting gauge %s  at x = %g, y = %g ... '  \
-                 % (gaugeno, gaugesoln.x, gaugesoln.y)
+        print(
+            (
+                "    Plotting gauge %s  at x = %g, y = %g ... "
+                % (
+                    gaugeno,
+                    gaugesoln.x,
+                    gaugesoln.y,
+                )
+            )
+        )
 
-    if plotdata.mode() == 'iplotclaw':
-        pylab.ion()
+    if plotdata.mode() == "iplotclaw":
+        plt.ion()
 
-        
     try:
         plotfigure_dict = plotdata.plotfigure_dict
     except:
-        print '*** Error in plotgauge: plotdata missing plotfigure_dict'
-        print '*** This should not happen'
+        print("*** Error in plotgauge: plotdata missing plotfigure_dict")
+        print("*** This should not happen")
         return None
 
     if len(plotfigure_dict) == 0:
-        print '*** Warning in plotgauge: plotdata has empty plotfigure_dict'
-        print '*** Apparently no figures to plot'
-
-
-
+        print("*** Warning in plotgauge: plotdata has empty plotfigure_dict")
+        print("*** Apparently no figures to plot")
 
     # initialize current_data containing data that will be passed
     # to beforegauge, aftergauge, afteraxes commands
     current_data = Data()
-    current_data.user = Data()   # for user specified attributes
-                                 # to avoid potential conflicts
+    current_data.user = Data()  # for user specified attributes
+    # to avoid potential conflicts
     current_data.plotdata = plotdata
     current_data.gaugeno = gaugeno
 
-    # call beforegauge if present, which might define additional 
+    # call beforegauge if present, which might define additional
     # attributes in current_data or otherwise set up plotting for this
     # gauge.
 
-    beforegauge =  getattr(plotdata, 'beforegauge', None)
+    beforegauge = getattr(plotdata, "beforegauge", None)
     if beforegauge:
         if isinstance(beforegauge, str):
             # a string to be executed
@@ -84,66 +91,71 @@ def plotgauge(gaugeno, plotdata, verbose=False):
             # assume it's a function
             try:
                 output = beforegauge(current_data)
-                if output: current_data = output
+                if output:
+                    current_data = output
             except:
-                print '*** Error in beforegauge ***'
+                print("*** Error in beforegauge ***")
                 raise
-
-
 
     # iterate over each single plot that makes up this gauge:
     # -------------------------------------------------------
- 
-    if plotdata._mode == 'iplotclaw':
+
+    if plotdata._mode == "iplotclaw":
         gaugesoln = plotdata.getgauge(gaugeno)
-        #import pdb; pdb.set_trace()
-        print '    Plotting Gauge %s  at x = %g, y = %g ... '  \
-                 % (gaugeno, gaugesoln.x, gaugesoln.y)
+        # import pdb; pdb.set_trace()
+        print(
+            (
+                "    Plotting Gauge %s  at x = %g, y = %g ... "
+                % (
+                    gaugeno,
+                    gaugesoln.x,
+                    gaugesoln.y,
+                )
+            )
+        )
         requested_fignos = plotdata.iplotclaw_fignos
     else:
         requested_fignos = plotdata.print_fignos
     plotted_fignos = []
 
-    plotdata = set_show(plotdata)   # set _show attributes for which figures
-                                    # and axes should be shown.
+    plotdata = frametools.set_show(plotdata)  # set _show attributes for which figures
+    # and axes should be shown.
 
-    # loop over figures to appear for this gauge: 
+    # loop over figures to appear for this gauge:
     # -------------------------------------------
 
     for figname in plotdata._fignames:
         plotfigure = plotdata.plotfigure_dict[figname]
-        if (not plotfigure._show) or (plotfigure.type != 'each_gauge'):
-            continue  # skip to next figure 
+        if (not plotfigure._show) or (plotfigure.type != "each_gauge"):
+            continue  # skip to next figure
 
         figno = plotfigure.figno
-        if requested_fignos != 'all':
+        if requested_fignos != "all":
             if figno not in requested_fignos:
-                continue # skip to next figure
+                continue  # skip to next figure
 
         plotted_fignos.append(figno)
 
-
-        if not plotfigure.kwargs.has_key('facecolor'):
+        if "facecolor" not in plotfigure.kwargs:
             # use Clawpack's default bg color (tan)
-            plotfigure.kwargs['facecolor'] = '#ffeebb'   
+            plotfigure.kwargs["facecolor"] = "#ffeebb"
 
         # create figure and set handle:
-        plotfigure._handle = pylab.figure(num=figno, **plotfigure.kwargs)
+        plotfigure._handle = plt.figure(num=figno, **plotfigure.kwargs)
 
-        pylab.ioff()
         if plotfigure.clf_each_gauge:
-            pylab.clf()
+            plt.clf()
 
         try:
             plotaxes_dict = plotfigure.plotaxes_dict
         except:
-            print '*** Error in plotgauge: plotdata missing plotaxes_dict'
-            print '*** This should not happen'
-            return  None
+            print("*** Error in plotgauge: plotdata missing plotaxes_dict")
+            print("*** This should not happen")
+            return None
 
         if (len(plotaxes_dict) == 0) or (len(plotfigure._axesnames) == 0):
-            print '*** Warning in plotgauge: plotdata has empty plotaxes_dict'
-            print '*** Apparently no axes to plot in figno ',figno
+            print("*** Warning in plotgauge: plotdata has empty plotaxes_dict")
+            print(("*** Apparently no axes to plot in figno ", figno))
 
         # loop over axes to appear on this figure:
         # ----------------------------------------
@@ -151,21 +163,18 @@ def plotgauge(gaugeno, plotdata, verbose=False):
         for axesname in plotfigure._axesnames:
             plotaxes = plotaxes_dict[axesname]
             if not plotaxes._show:
-                continue   # skip this axes if no items show
+                continue  # skip this axes if no items show
 
             # create the axes:
-            axescmd = getattr(plotaxes,'axescmd','subplot(1,1,1)')
-            axescmd = 'plotaxes._handle = pylab.%s' % axescmd
+            axescmd = getattr(plotaxes, "axescmd", "subplot(1,1,1)")
+            axescmd = "plotaxes._handle = plt.%s" % axescmd
             exec(axescmd)
-            pylab.hold(True)
-
-
 
             # loop over items:
             # ----------------
 
             for itemname in plotaxes._itemnames:
-                
+
                 plotitem = plotaxes.plotitem_dict[itemname]
                 try:
                     outdir = plotitem.outdir
@@ -173,44 +182,41 @@ def plotgauge(gaugeno, plotdata, verbose=False):
                         outdir = plotdata.outdir
                     gaugesoln = plotdata.getgauge(gaugeno, outdir)
                 except:
-                    print '*** Cannot find gauge number ',gaugeno
-                    print '*** looking in directory ', outdir
-                    print '*** cwd = ',os.getcwd()
+                    print(("*** Cannot find gauge number ", gaugeno))
+                    print(("*** looking in directory ", outdir))
+                    print(("*** cwd = ", os.getcwd()))
                     return None
 
-                #import pdb; pdb.set_trace()
+                # import pdb; pdb.set_trace()
                 current_data.gaugesoln = gaugesoln
                 current_data.q = gaugesoln.q
                 current_data.t = gaugesoln.t
 
                 if plotitem._show:
                     try:
-                        output = plotgauge1(gaugesoln,plotitem,\
-                            current_data)
-                        if output: current_data = output
-                        if verbose:  
-                                print '      Plotted  plotitem ', itemname
+                        output = plotgauge1(gaugesoln, plotitem, current_data)
+                        if output:
+                            current_data = output
+                        if verbose:
+                            print(("      Plotted  plotitem ", itemname))
                     except:
-                        print '*** Error in plotgauge: problem calling plotgauge1'
+                        print("*** Error in plotgauge: problem calling plotgauge1")
                         traceback.print_exc()
                         return None
 
             # end of loop over plotitems
 
-
         for itemname in plotaxes._itemnames:
             plotitem = plotaxes.plotitem_dict[itemname]
             if plotitem.afteritem:
-                print "*** ClawPlotItem.afteritem is deprecated"
-                print "*** use ClawPlotAxes.afteraxes "
-                print "*** or  ClawPlotItem.aftergrid instead"
+                print("*** ClawPlotItem.afteritem is deprecated")
+                print("*** use ClawPlotAxes.afteraxes ")
+                print("*** or  ClawPlotItem.aftergrid instead")
 
-
-        pylab.title("%s at gauge %s" % (plotaxes.title,gaugeno))
-
+        plt.title("%s at gauge %s" % (plotaxes.title, gaugeno))
 
         # call an afteraxes function if present:
-        afteraxes =  getattr(plotaxes, 'afteraxes', None)
+        afteraxes = getattr(plotaxes, "afteraxes", None)
         if afteraxes:
             if isinstance(afteraxes, str):
                 # a string to be executed
@@ -221,34 +227,33 @@ def plotgauge(gaugeno, plotdata, verbose=False):
                     current_data.plotaxes = plotaxes
                     current_data.plotfigure = plotaxes._plotfigure
                     output = afteraxes(current_data)
-                    if output: current_data = output
+                    if output:
+                        current_data = output
                 except:
-                    print '*** Error in afteraxes ***'
+                    print("*** Error in afteraxes ***")
                     raise
 
         if plotaxes.scaled:
-            pylab.axis('scaled')
+            plt.axis("scaled")
 
         # set axes limits:
         if (plotaxes.xlimits is not None) & (type(plotaxes.xlimits) is not str):
             try:
-                pylab.xlim(plotaxes.xlimits[0], plotaxes.xlimits[1])
+                plt.xlim(plotaxes.xlimits[0], plotaxes.xlimits[1])
             except:
                 pass  # let axis be set automatically
         if (plotaxes.ylimits is not None) & (type(plotaxes.ylimits) is not str):
             try:
-                pylab.ylim(plotaxes.ylimits[0], plotaxes.ylimits[1])
+                plt.ylim(plotaxes.ylimits[0], plotaxes.ylimits[1])
             except:
                 pass  # let axis be set automatically
 
-
             # end of loop over plotaxes
-            
+
         # end of loop over plotfigures
 
-
     # call an aftergauge function if present:
-    aftergauge =  getattr(plotdata, 'aftergauge', None)
+    aftergauge = getattr(plotdata, "aftergauge", None)
     if aftergauge:
         if isinstance(aftergauge, str):
             # a string to be executed
@@ -257,38 +262,41 @@ def plotgauge(gaugeno, plotdata, verbose=False):
             # assume it's a function
             try:
                 output = aftergauge(current_data)
-                if output: current_data = output
+                if output:
+                    current_data = output
             except:
-                print '*** Error in aftergauge ***'
+                print("*** Error in aftergauge ***")
                 raise
 
-
-    if plotdata.mode() == 'iplotclaw':
-        pylab.ion()
+    if plotdata.mode() == "iplotclaw":
+        plt.ion()
     for figno in plotted_fignos:
-        pylab.figure(figno)
-        pylab.draw()
+        plt.figure(figno)
+        plt.draw()
 
     if verbose:
-        print '    Done with plotgauge for gauge %i' % (gaugeno)
+        print(("    Done with plotgauge for gauge %i" % (gaugeno)))
 
-    
     # print the figure(s) to file(s) if requested:
-    if (plotdata.mode() != 'iplotclaw') & plotdata.printfigs:
+    if (plotdata.mode() != "iplotclaw") & plotdata.printfigs:
         # iterate over all figures that are to be printed:
         for figno in plotted_fignos:
-            printfig(gaugeno=gaugeno, figno=figno, \
-                    format=plotdata.print_format, plotdir=plotdata.plotdir,\
-                    verbose=verbose)
+            printfig(
+                gaugeno=gaugeno,
+                figno=figno,
+                format=plotdata.print_format,
+                plotdir=plotdata.plotdir,
+                verbose=verbose,
+            )
 
     return current_data
 
     # end of plotgauge
 
-    
-#==================================================================
+
+# ==================================================================
 def plotgauge1(gaugesoln, plotitem, current_data):
-#==================================================================
+    # ==================================================================
     """
     Make a 1d plot for a single plot item for the gauge solution in
     gaugesoln.
@@ -305,13 +313,12 @@ def plotgauge1(gaugesoln, plotitem, current_data):
     plotfigure = plotitem._plotfigure
     plotaxes = plotitem._plotaxes
 
-
     # the following plot parameters may be set, depending on what
     # plot_type was requested:
 
     plot_params = """
-             plot_var  aftergrid  plotstyle color kwargs 
-             plot_var2 fill_where map_2d_to_1d 
+             plot_var  aftergrid  plotstyle color kwargs
+             plot_var2 fill_where map_2d_to_1d
              """.split()
 
     # No amr_ parameters for gauge data.
@@ -323,9 +330,9 @@ def plotgauge1(gaugesoln, plotitem, current_data):
     plotstyle = plotitem.plotstyle
 
     t = gaugesoln.t
-    if type(plot_var) is int:
-        #import pdb pdb.set_trace()
-        var = gaugesoln.q[:,plot_var]
+    if isinstance(plot_var, int):
+        # import pdb pdb.set_trace()
+        var = gaugesoln.q[:, plot_var]
     else:
         try:
             var = plot_var(gaugesoln)
@@ -336,23 +343,20 @@ def plotgauge1(gaugesoln, plotitem, current_data):
 
     # The plot commands using matplotlib:
 
-    pylab.hold(True)
+    # plt.hold(True)
 
-    pylab.title("%s at Gauge %i" % (plotitem._plotaxes.title,\
-                 gaugesoln.gaugeno))
+    plt.title("%s at Gauge %i" % (plotitem._plotaxes.title, gaugesoln.gaugeno))
 
-    pylab.xlabel("time")
+    plt.xlabel("time")
 
-    if (plot_type in ['1d_plot']) and (plotstyle != ''):
+    if (plot_type in ["1d_plot"]) and (plotstyle != ""):
         if color:
-            kwargs['color'] = color
+            kwargs["color"] = color
 
-        plotcommand = "pobj=pylab.plot(t,var,'%s', **kwargs)"  \
-                      % plotstyle
+        plotcommand = "pobj=plt.plot(t , var, '%s', **kwargs)" % plotstyle
         exec(plotcommand)
 
-
-    elif plot_type == '1d_empty':
+    elif plot_type == "1d_empty":
         # no plot to create (user might make one in afteritem or
         # afteraxes)
         pass
@@ -362,15 +366,19 @@ def plotgauge1(gaugesoln, plotitem, current_data):
         return None
 
     return current_data
-    
+
+
+def find(condition):
+    return np.flatnonzero(condition)
+
+
 def read_setgauges(datadir):
     """
     Read the info from setgauges.data.
     """
     import os
-    import numpy as np
+
     from pyclaw.data import Data
-    from matplotlib.mlab import find
 
     setgauges = Data()
 
@@ -382,12 +390,12 @@ def read_setgauges(datadir):
     setgauges.t1 = {}
     setgauges.t2 = {}
 
-    fname = os.path.join(datadir, 'setgauges.data')
+    fname = os.path.join(datadir, "setgauges.data")
     if not os.path.isfile(fname):
-        #print "*** Warning in read_setgauges: missing file ",fname
+        # print "*** Warning in read_setgauges: missing file ",fname
         return setgauges
 
-    sgfile = open(fname,'r')
+    sgfile = open(fname, "r")
     lines = sgfile.readlines()
     sgfile.close()
 
@@ -395,31 +403,36 @@ def read_setgauges(datadir):
     ignore_line = True
     while ignore_line:
         line = lines[lineno] + "#"
-        #print "+++ lineno = %s, line = %s" % (lineno,line)
-        if line.split()[0][0]=="#":
-            lineno = lineno+1
+        # print "+++ lineno = %s, line = %s" % (lineno,line)
+        if line.split()[0][0] == "#":
+            lineno = lineno + 1
         else:
             ignore_line = False
 
     try:
         numgauges = int(line.split()[0])
     except:
-        print "*** error setting numgauges"
+        print("*** error setting numgauges")
         return
 
-    if numgauges==0:
+    if numgauges == 0:
         return setgauges
-        
-    #print '+++ ignoring %s lines, numgauges = %s' %(lineno, numgauges)
+
+    # print '+++ ignoring %s lines, numgauges = %s' %(lineno, numgauges)
     try:
-        sgno, x, y, t1, t2 = np.loadtxt(fname, unpack=True, skiprows=lineno+1, \
-                                usecols=range(5))
-        if numgauges==1:
+        sgno, x, y, t1, t2 = np.loadtxt(
+            fname, unpack=True, skiprows=lineno + 1, usecols=list(range(5))
+        )
+        if numgauges == 1:
             # loadtxt returns numbers rather than arrays in this case:
-            sgno = [sgno]; x = [x]; y = [y]; t1 = [t1]; t2 = [t2]
+            sgno = [sgno]
+            x = [x]
+            y = [y]
+            t1 = [t1]
+            t2 = [t2]
 
     except:
-        print "*** problem reading gauges from setgauges.data"
+        print("*** problem reading gauges from setgauges.data")
         return setgauges
 
     sgno = np.array(sgno, dtype=int)  # convert to int
@@ -427,12 +440,12 @@ def read_setgauges(datadir):
     setgauges.numgauges = numgauges
 
     for n in sgno:
-        nn = find(sgno==n)
+        nn = find(sgno == n)
         if len(nn) > 1:
-            print "*** Warning: found more than one gauge numbered ",n
+            print(("*** Warning: found more than one gauge numbered ", n))
 
         if len(nn) == 0:
-            print "*** Error: didn't find gauge number %s in %s" % (n,fname)
+            print(("*** Error: didn't find gauge number %s in %s" % (n, fname)))
         else:
             nn = nn[0]
             setgauges.x[n] = x[nn]
@@ -443,9 +456,19 @@ def read_setgauges(datadir):
     return setgauges
 
 
-def plot_gauge_locations(plotdata, gaugenos='all', \
-                format_string='ko',add_labels=True, \
-                markersize=5, fontsize=15, xoffset=0, yoffset=0):
+def plot_gauge_locations(
+    plotdata,
+    gaugenos="all",
+    format_string="ko",
+    add_labels=True,
+    markersize=5,
+    mfc=None,
+    mec=None,
+    mew=None,
+    fontsize=15,
+    xoffset=0,
+    yoffset=0,
+):
     """
     Plot gauge locations on current axes.
     format_string specifies the symbol to be plotted.
@@ -455,7 +478,7 @@ def plot_gauge_locations(plotdata, gaugenos='all', \
     produced by running the code.
     """
 
-    from pylab import figure, plot, clf, title, text
+    from matplotlib.pyplot import clf, figure, plot, text, title
 
     datadir = plotdata.outdir  # this should contain setgauges.data
 
@@ -465,62 +488,77 @@ def plot_gauge_locations(plotdata, gaugenos='all', \
         return
 
     if setgauges.numgauges == 0:
-        print "*** plot_gauge_locations: No gauges specified in setgauges.data"
+        print("*** plot_gauge_locations: No gauges specified in setgauges.data")
         return
 
-    if gaugenos=='all':
+    if gaugenos == "all":
         gaugenos = setgauges.gaugenos
 
+    gauge_marker_kwargs = {}
+    if mew is not None:
+        gauge_marker_kwargs["mew"] = mew
+    if mfc is not None:
+        gauge_marker_kwargs["mfc"] = mfc
+    if mec is not None:
+        gauge_marker_kwargs["mec"] = mec
 
     for n in gaugenos:
         try:
             xn = setgauges.x[n]
             yn = setgauges.y[n]
-            #print "Gauge %s:  x = %g, y = %g" % (n,xn,yn)
-            plot([xn], [yn], format_string, markersize=markersize)
-            if add_labels: 
+            # print "Gauge %s:  x = %g, y = %g" % (n,xn,yn)
+
+            plot(
+                [xn], [yn], format_string, markersize=markersize, **gauge_marker_kwargs
+            )
+            if add_labels:
                 xn = xn + xoffset
                 yn = yn + yoffset
-                text(xn,yn,'  %s' % n, fontsize=fontsize)
+                text(xn, yn, "  %s" % n, fontsize=fontsize)
         except:
-            print "*** plot_gauge_locations: warning: did not find x,y data for gauge ",n
+            print(
+                (
+                    "*** plot_gauge_locations: warning: did not find x,y data for gauge ",
+                    n,
+                )
+            )
 
 
-#------------------------------------------------------------------------
-def printfig(fname='',gaugeno='', figno='', format='png', plotdir='.', \
-             verbose=True):
-#------------------------------------------------------------------------
+# ------------------------------------------------------------------------
+def printfig(fname="", gaugeno="", figno="", format="png", plotdir=".", verbose=True):
+    # ------------------------------------------------------------------------
     """
-    Save the current plot to file fname or standard name from gauge/fig.
-.  
-    If fname is nonempty it is used as the filename, with extension
-    determined by format if it does not already have a valid extension.
+        Save the current plot to file fname or standard name from gauge/fig.
+    .
+        If fname is nonempty it is used as the filename, with extension
+        determined by format if it does not already have a valid extension.
 
-    If fname=='' then save to file gauge000NfigJ.ext  where N is the gauge
-    number gaugeno passed in, J is the figure number figno passed in,
-    and the extension ext is determined by format.  
-    If figno='' then the figJ part is omitted.
+        If fname=='' then save to file gauge000NfigJ.ext  where N is the gauge
+        number gaugeno passed in, J is the figure number figno passed in,
+        and the extension ext is determined by format.
+        If figno='' then the figJ part is omitted.
     """
 
-    if fname == '':
-        fname = 'gauge' + str(gaugeno).rjust(4,'0') 
-        if isinstance(figno,int):
-            fname = fname + 'fig%s' % figno
+    if fname == "":
+        fname = "gauge" + str(gaugeno).rjust(4, "0")
+        if isinstance(figno, int):
+            fname = fname + "fig%s" % figno
     splitfname = os.path.splitext(fname)
-    if splitfname[1] not in ('.png','.emf','.eps','.pdf'):
-        fname = splitfname[0] + '.%s' % format
-    if figno=='':
+    if splitfname[1] not in (".png", ".emf", ".eps", ".pdf"):
+        fname = splitfname[0] + ".%s" % format
+    if figno == "":
         figno = 1
-    pylab.figure(figno)
-    if plotdir != '.':
-       fname = os.path.join(plotdir,fname)
-    if verbose:  print '    Saving plot to file ', fname
-    pylab.savefig(fname)
+    plt.figure(figno)
+    if plotdir != ".":
+        fname = os.path.join(plotdir, fname)
+    if verbose:
+        print(("    Saving plot to file ", fname))
+    plt.savefig(fname)
 
 
-#======================================================================
+# ======================================================================
 def printgauges(plotdata=None, verbose=True):
-#======================================================================
+    # ======================================================================
 
     """
     Produce a set of png files for all the figures specified by plotdata.
@@ -528,7 +566,7 @@ def printgauges(plotdata=None, verbose=True):
     between them.  These will all be in directorey plotdata.plotdir.
 
     The ClawPlotData object plotdata will be initialized by a call to
-    function setplot unless plotdata.setplot=False.  
+    function setplot unless plotdata.setplot=False.
 
     If plotdata.setplot=True then it is assumed that the current directory
     contains a module setplot.py that defines this function.
@@ -540,19 +578,18 @@ def printgauges(plotdata=None, verbose=True):
     """
 
     import glob
+
     from pyclaw.plotters.data import ClawPlotData
 
-
-
-    if not sys.modules.has_key('matplotlib'):
-        print '*** Error: matplotlib not found, no plots will be done'
-        return plotdata
-        
-    if not isinstance(plotdata,ClawPlotData):
-        print '*** Error, plotdata must be an object of type ClawPlotData'
+    if "matplotlib" not in sys.modules:
+        print("*** Error: matplotlib not found, no plots will be done")
         return plotdata
 
-    plotdata._mode = 'printframes'
+    if not isinstance(plotdata, ClawPlotData):
+        print("*** Error, plotdata must be an object of type ClawPlotData")
+        return plotdata
+
+    plotdata._mode = "printframes"
 
     plotdata = call_setplot(plotdata.setplot, plotdata)
 
@@ -561,138 +598,137 @@ def printgauges(plotdata=None, verbose=True):
         plotdata.outdir = os.path.abspath(plotdata.outdir)
         plotdata.plotdir = os.path.abspath(plotdata.plotdir)
 
-        framenos = plotdata.print_framenos # frames to plot
-        framenos = plotdata.print_framenos # frames to plot
-        fignos = plotdata.print_fignos     # figures to plot at each frame
-        fignames = {}                      # names to use in html files
+        framenos = plotdata.print_framenos  # frames to plot
+        framenos = plotdata.print_framenos  # frames to plot
+        fignos = plotdata.print_fignos  # figures to plot at each frame
+        fignames = {}  # names to use in html files
 
-        rundir = plotdata.rundir       # directory containing *.data files
-        outdir = plotdata.outdir       # directory containing fort.* files
-        plotdir = plotdata.plotdir     # where to put png and html files
-        overwrite = plotdata.overwrite # ok to overwrite?
-        msgfile = plotdata.msgfile     # where to write error messages
+        rundir = plotdata.rundir  # directory containing *.data files
+        outdir = plotdata.outdir  # directory containing fort.* files
+        plotdir = plotdata.plotdir  # where to put png and html files
+        overwrite = plotdata.overwrite  # ok to overwrite?
+        msgfile = plotdata.msgfile  # where to write error messages
     except:
-        print '*** Error in printframes: plotdata missing attribute'
-        print '  *** plotdata = ',plotdata
+        print("*** Error in printframes: plotdata missing attribute")
+        print(("  *** plotdata = ", plotdata))
         return plotdata
 
-    if fignos == 'all':
+    if fignos == "all":
         fignos = plotdata._fignos
-        #for (figname,plotfigure) in plotdata.plotfigure_dict.iteritems():
+        # for (figname,plotfigure) in plotdata.plotfigure_dict.iteritems():
         #    fignos.append(plotfigure.figno)
 
-
     # filter out the fignos that will be empty, i.e.  plotfigure._show=False.
-    plotdata = set_show(plotdata)
+    plotdata = frametools.set_show(plotdata)
     fignos_to_show = []
     for figname in plotdata._fignames:
         figno = plotdata.plotfigure_dict[figname].figno
         if (figno in fignos) and plotdata.plotfigure_dict[figname]._show:
             fignos_to_show.append(figno)
     fignos = fignos_to_show
-        
+
     # figure out what type each figure is:
     fignos_each_frame = []
     fignos_each_gauge = []
     fignos_each_run = []
     for figno in fignos:
         figname = plotdata._figname_from_num[figno]
-        if plotdata.plotfigure_dict[figname].type == 'each_frame':
+        if plotdata.plotfigure_dict[figname].type == "each_frame":
             fignos_each_frame.append(figno)
-        if plotdata.plotfigure_dict[figname].type == 'each_gauge':
+        if plotdata.plotfigure_dict[figname].type == "each_gauge":
             fignos_each_gauge.append(figno)
-        if plotdata.plotfigure_dict[figname].type == 'each_run':
+        if plotdata.plotfigure_dict[figname].type == "each_run":
             fignos_each_run.append(figno)
-        
 
     rootdir = os.getcwd()
 
     # annoying fix needed when EPD is used for plotting under cygwin:
-    if rootdir[0:9] == 'C:\cygwin' and outdir[0:9] != 'C:\cygwin':
-        outdir = 'C:\cygwin' + outdir
+    if rootdir[0:9] == "C:\cygwin" and outdir[0:9] != "C:\cygwin":
+        outdir = "C:\cygwin" + outdir
         plotdata.outdir = outdir
-    if rootdir[0:9] == 'C:\cygwin' and rundir[0:9] != 'C:\cygwin':
-        rundir = 'C:\cygwin' + rundir
+    if rootdir[0:9] == "C:\cygwin" and rundir[0:9] != "C:\cygwin":
+        rundir = "C:\cygwin" + rundir
         plotdata.rundir = rundir
-    if rootdir[0:9] == 'C:\cygwin' and plotdir[0:9] != 'C:\cygwin':
-        plotdir = 'C:\cygwin' + plotdir
+    if rootdir[0:9] == "C:\cygwin" and plotdir[0:9] != "C:\cygwin":
+        plotdir = "C:\cygwin" + plotdir
         plotdata.plotdir = plotdir
 
     try:
         os.chdir(rundir)
     except:
-        print '*** Error: cannot move to run directory ',rundir
-        print 'rootdir = ',rootdir
+        print(("*** Error: cannot move to run directory ", rundir))
+        print(("rootdir = ", rootdir))
         return plotdata
 
-
-    if msgfile != '':
-        sys.stdout = open(msgfile, 'w')
+    if msgfile != "":
+        sys.stdout = open(msgfile, "w")
         sys.stderr = sys.stdout
-
 
     try:
         plotpages.cd_plotdir(plotdata)
     except:
-        print "*** Error, aborting plotframes"
+        print("*** Error, aborting plotframes")
         return plotdata
 
-
-    framefiles = glob.glob(os.path.join(plotdir,'frame*.png')) + \
-                    glob.glob(os.path.join(plotdir,'frame*.html'))
+    framefiles = glob.glob(os.path.join(plotdir, "frame*.png")) + glob.glob(
+        os.path.join(plotdir, "frame*.html")
+    )
     if overwrite:
         # remove any old versions:
         for file in framefiles:
             os.remove(file)
     else:
         if len(framefiles) > 1:
-            print "*** Remove frame*.png and frame*.html and try again,"
-            print "  or use overwrite=True in call to printframes"
+            print("*** Remove frame*.png and frame*.html and try again,")
+            print("  or use overwrite=True in call to printframes")
             return plotdata
 
-    
     # Create each of the figures
-    #---------------------------
+    # ---------------------------
 
     try:
         os.chdir(outdir)
     except:
-        print '*** Error printframes: cannot move to outdir = ',outdir
+        print(("*** Error printframes: cannot move to outdir = ", outdir))
         return plotdata
-
 
     fortfile = {}
     pngfile = {}
     frametimes = {}
 
     import glob
-    for file in glob.glob('fort.q*'):
+
+    for file in glob.glob("fort.q*"):
         frameno = int(file[7:10])
         fortfile[frameno] = file
         for figno in fignos_each_frame:
-            pngfile[frameno,figno] = 'frame' + file[-4:] + 'fig%s.png' % figno
-    
+            pngfile[frameno, figno] = "frame" + file[-4:] + "fig%s.png" % figno
+
     if len(fortfile) == 0:
-        print '*** No fort.q files found in directory ', os.getcwd()
+        print(("*** No fort.q files found in directory ", os.getcwd()))
         return plotdata
-    
+
     # Discard frames that are not from latest run, based on
     # file modification time:
     framenos = only_most_recent(framenos, plotdata.outdir)
 
     numframes = len(framenos)
 
-    print "Will plot %i frames numbered:" % numframes, framenos
-    print 'Will make %i figure(s) for each frame, numbered: ' \
-          % len(fignos_each_frame), fignos_each_frame
+    print(("Will plot %i frames numbered:" % numframes, framenos))
+    print(
+        (
+            "Will make %i figure(s) for each frame, numbered: "
+            % len(fignos_each_frame),
+            fignos_each_frame,
+        )
+    )
 
-    #fignames = {}
-    #for figname in plotdata._fignames:
-        #figno = plotdata.plotfigure_dict[figname].figno
-        #fignames[figno] = figname
+    # fignames = {}
+    # for figname in plotdata._fignames:
+    # figno = plotdata.plotfigure_dict[figname].figno
+    # fignames[figno] = figname
     # use new attribute:
     fignames = plotdata._figname_from_num
-
 
     for frameno in framenos:
         frametimes[frameno] = plotdata.getframe(frameno, plotdata.outdir).t
@@ -712,44 +748,44 @@ def printgauges(plotdata=None, verbose=True):
 
     if plotdata.html:
         plotpages.timeframes2html(plotdata)
-    
+
     # Make png files for all frames and gauges:
     # -----------------------------------------
 
     if not plotdata.printfigs:
-        print "Using previously printed figure files"
+        print("Using previously printed figure files")
     else:
-        print "Now making png files for all figures..."
+        print("Now making png files for all figures...")
         for frameno in framenos:
             plotframe(frameno, plotdata, verbose)
-            print 'Frame %i at time t = %s' % (frameno, frametimes[frameno])
+            print(("Frame %i at time t = %s" % (frameno, frametimes[frameno])))
         for gaugeno in gaugenos:
             plotgauge(gaugeno, plotdata, verbose)
-            print 'Gauge %i ' % gaugeno
-
+            print(("Gauge %i " % gaugeno))
 
     if plotdata.latex:
         plotpages.timeframes2latex(plotdata)
-    
 
     # Movie:
-    #-------
-    
+    # -------
+
     if plotdata.gif_movie:
-        print 'Making gif movies.  This may take some time....'
+        print("Making gif movies.  This may take some time....")
         for figno in fignos_each_frame:
             try:
-                os.system('convert -delay 20 frame*fig%s.png moviefig%s.gif' \
-                   % (figno,figno))
-                print '    Created moviefig%s.gif' % figno
+                os.system(
+                    "convert -delay 20 frame*fig%s.png moviefig%s.gif" % (figno, figno)
+                )
+                print(("    Created moviefig%s.gif" % figno))
             except:
-                print '*** Error creating moviefig%s.gif' % figno
-    
+                print(("*** Error creating moviefig%s.gif" % figno))
+
     os.chdir(rootdir)
 
     # print out pointers to html index page:
-    path_to_html_index = os.path.join(os.path.abspath(plotdata.plotdir), \
-                               plotdata.html_index_fname)
+    path_to_html_index = os.path.join(
+        os.path.abspath(plotdata.plotdir), plotdata.html_index_fname
+    )
     plotpages.print_html_pointers(path_to_html_index)
 
     # reset stdout for future print statements
@@ -757,4 +793,3 @@ def printgauges(plotdata=None, verbose=True):
 
     return plotdata
     # end of printframes
-
